@@ -40,13 +40,12 @@ int main(int argc, char *argv[]) {
 	if (fgets(texte, LIGNE_MAX, stdin) == NULL) {
 	  	printf("Fin de fichier (ou erreur) : arret.\n");
 	  	arret = VRAI;
-	  	continue;
 	}
 	else {
 	 	nbecr = ecrireLigne(sock, texte);
 	  	if (nbecr == -1) {
 			erreur_IO("ecrireLigne");
-			arret == VRAI;
+			arret = VRAI;
 	 	}
 			printf("Nom enregistré par le serveur\n");
 	}

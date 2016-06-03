@@ -35,6 +35,24 @@ int main(int argc, char *argv[]) {
 
   freeResolv();
 
+
+    printf("Entrez votre nom d'utilisateur> ");
+    if (fgets(texte, LIGNE_MAX, stdin) == NULL) {
+      	printf("Fin de fichier (ou erreur) : arret.\n");
+      	arret = VRAI;
+      	continue;
+    }
+    else {
+     	 nbecr = ecrireLigne(sock, texte);
+      	if (nbecr == -1) {
+			erreur_IO("ecrireLigne");
+			arret == VRAI;
+     	 }
+			printf("Nom enregistré par le serveur\n");
+      }
+ 
+  
+
   while (arret == FAUX) {
     printf("ligne> ");
     if (fgets(texte, LIGNE_MAX, stdin) == NULL) {

@@ -1,7 +1,7 @@
 #include "pse.h"
 
 int journal;
-int utilisateurs[];
+int *utilisateurs;
 
 
 void *traiterRequete(void *arg);

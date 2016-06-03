@@ -1,14 +1,34 @@
 #include "pse.h"
 
 int journal;
+int utilisateurs[];
+
+
+void *traiterRequete(void *arg);
 
 void *traiterRequete(void *arg) {
     DataSpec * data = (DataSpec *) arg;
-    int arret = FAUX, nblus, mode;
+    int arret = FAUX, nblus, mode, pseudo = FAUX;
     char texte[LIGNE_MAX];
   
     mode = O_WRONLY | O_APPEND | O_CREAT | O_TRUNC;
 
+    /*Dans un premier temps nous allons enregistrer le pseudo et voir
+    si il n'existe pas déjà*/
+    while (pseudo == FAUX){
+        nblus = lireLigne (data->canal, texte);
+        if (nblus == -1) {
+            erreur_IO("lireLigne");
+        }
+        else if (nblus == LIGNE_MAX) {
+            erreur("ligne trop longue\n");
+        }
+        else if (nblus == 0) {
+            continue;
+        }
+        else {
+        }
+    }
     while (arret == FAUX) {
         nblus = lireLigne (data->canal, texte);
         if (nblus == -1) {

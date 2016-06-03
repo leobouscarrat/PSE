@@ -36,6 +36,7 @@ int main(int argc, char *argv[]) {
   	freeResolv();
 
 
+  	/*Choix du nom d'utilisateur*/
 	printf("Entrez votre nom d'utilisateur> ");
 	if (fgets(texte, LIGNE_MAX, stdin) == NULL) {
 	  	printf("Fin de fichier (ou erreur) : arret.\n");
@@ -47,7 +48,7 @@ int main(int argc, char *argv[]) {
 			erreur_IO("ecrireLigne");
 			arret = VRAI;
 	 	}
-			printf("Nom enregistré par le serveur\n");
+		printf("Nom enregistré par le serveur\n");
 	}
  
   

@@ -5,7 +5,7 @@
 void menu(void);
 
 int main(int argc, char *argv[]) {
-  	int sock, arret = FAUX, ret, nbecr;
+  	int sock, arret = FAUX, ret, nbecr, nblus;
   	struct sockaddr_in *sa;
   	char texte[LIGNE_MAX];
   
@@ -40,6 +40,7 @@ int main(int argc, char *argv[]) {
 
   	/*Choix du nom d'utilisateur*/
 	printf("Entrez votre nom d'utilisateur> ");
+
 	if (fgets(texte, LIGNE_MAX, stdin) == NULL) {
 	  	printf("Fin de fichier (ou erreur) : arret.\n");
 	  	arret = VRAI;
@@ -51,15 +52,25 @@ int main(int argc, char *argv[]) {
 			arret = VRAI;
 	 	}
 		printf("Nom enregistré par le serveur\n");
-	}
+		nblus = lireLigne(sock, texte);
+		if (nblus == -1) {
+                erreur_IO("lireLigne");
+            }
+            else if (nblus == LIGNE_MAX) {
+                erreur("ligne trop longue\n");
+            }
+            else {
+            	printf("%s\n", texte);
+            }
+       	}
 
   	while (arret == FAUX) {
   		menu();
 	    printf("ligne> ");
 	    if (fgets(texte, LIGNE_MAX, stdin) == NULL) {
-	      printf("Fin de fichier (ou erreur) : arret.\n");
-	      arret = VRAI;
-	      continue;
+	      	printf("Fin de fichier (ou erreur) : arret.\n");
+	      	arret = VRAI;
+	      	continue;
 	    }
 	    else {
 	      	nbecr = ecrireLigne(sock, texte);

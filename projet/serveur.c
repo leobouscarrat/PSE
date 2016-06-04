@@ -11,8 +11,8 @@ void ajouterPseudo(char *texte, int tid); // la fonction ajoute un Pseudo à la 
 
 void *traiterRequete(void *arg) {
     DataSpec * data = (DataSpec *) arg;
-    int arret = FAUX, nblus, mode, pseudo = FAUX;
-    char texte[LIGNE_MAX];
+    int arret = FAUX, nblus, mode, pseudo = FAUX, nbecr;
+    char texte[LIGNE_MAX], mes[LIGNE_MAX];
   
     mode = O_WRONLY | O_APPEND | O_CREAT | O_TRUNC;
 
@@ -30,10 +30,19 @@ void *traiterRequete(void *arg) {
             }
             else {
                 ajouterPseudo(texte, data->tid);
+<<<<<<< HEAD
                 printf("worker%d enregistré, l'id est %d et pseudo est %s \n", data->tid, data->tid, texte);
                 sprintf(texte,"Connexion d'un nouvel utilisateur : %s",utilisateurs[0].pseudo);
                 ecrireLog();
                 ecrireLigne(journal, texte);
+=======
+                sprintf(mes, "Vous etes enregistre en tant que %s, votre id est %d\n", texte, data->tid);
+                nbecr = ecrireLigne(data->canal, mes);
+                if (nbecr == -1) {
+                    erreur_IO("ecrireLigne");
+                    arret = VRAI;
+                }
+>>>>>>> 7bdff0b5c6bf5c72a93b3a23c1db3ad144f13cd9
                 pseudo = VRAI;
             }
         }

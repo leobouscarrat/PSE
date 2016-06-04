@@ -62,12 +62,8 @@ void *traiterRequete(void *arg) {
 	           printf("worker%d: arret demande.\n", data->tid);
 	           ecrireLog();
 	           sprintf(nom,"L'utilisateur %s s'est déconnecté",utilisateurs[data->tid-1].pseudo);
-<<<<<<< HEAD
-	           if (ecrireLigne(journal, nom) == -1) {
-=======
 	           nblus = ecrireLigne(journal, nom);
                if (nblus == -1) {
->>>>>>> a1c275ae5c5a2cddc4cbeba9b35fbf2b3b77e6e9
 	    			erreur_IO("ecrireLigne");
 					}
 	           arret = VRAI;

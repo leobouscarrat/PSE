@@ -174,13 +174,8 @@ void ajouterPseudo(char *texte, int tid){
     int l;
     l = NELEMS(utilisateurs);
     utilisateurs = realloc(utilisateurs, sizeof(utilisateurs[0])*l+1);
-<<<<<<< HEAD
     strcpy(utilisateurs[l].pseudo, texte);
     utilisateurs[l].pid = tid;
-}
-=======
-    strcpy(utilisateurs[0].pseudo, texte);
-    utilisateurs[0].pid = tid;
 }
 
 char *printTime(void){

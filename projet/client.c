@@ -5,7 +5,7 @@
 void menu(void);
 
 int main(int argc, char *argv[]) {
-  	int sock, arret = FAUX, ret, nbecr, nblus;
+  	int sock, arret = FAUX, ret, nbecr, nblus, affichage = FAUX;
   	struct sockaddr_in *sa;
   	char texte[LIGNE_MAX];
   
@@ -80,6 +80,33 @@ int main(int argc, char *argv[]) {
 	      	if (strcmp(texte, "/fin\n") == 0) {
 				printf("Client. arret demande.\n");
 				arret = VRAI;
+	      	}
+	      	else if (strcmp(texte, "1\n") == 0){
+	      		affichage = FAUX;
+	      		printf("\nAffichage liste des utilisateurs connectés :\n");
+	      		while(affichage == FAUX){
+		      		nblus = lireLigne(sock, texte);
+			      	if (nblus == -1) {
+		                erreur_IO("lireLigne");
+		            }
+		            else if (nblus == LIGNE_MAX) {
+		                erreur("ligne trop longue\n");
+		            }
+		            else {
+		            	if(strcmp(texte, "FIN")==0){
+		            		affichage = VRAI;
+		            	}
+		            	else {
+			            	printf("%s\n", texte);
+			            	nbecr = ecrireLigne(sock, "OK\n");
+			            	if (nbecr == -1) {
+								erreur_IO("ecrireLigne");
+			      			}
+			      		}
+		      		}
+	            }
+	            printf("Appuyez sur une touche pour revenir au menu\n");
+	            getchar();
 	      	}
 	     	else {
 				printf("%s: ligne de %d octets envoyee au serveur.\n", CMD, nbecr);

@@ -1,7 +1,7 @@
 #include "pse.h"
-#define NELEMS(x)  (sizeof(x) / sizeof((x)[0]))
 
 int journal;
+int taille=0;
 struct user *utilisateurs;
 
 char *printTime(void); // La fonction permet de renvoyer une chaine de caractère du temps 
@@ -80,7 +80,8 @@ void *traiterRequete(void *arg) {
 	            }
             }
             else if (strcmp(texte, "1") == 0){
-                for(i = 0; i < NELEMS(utilisateurs); i++){
+                printf("worker%d: affichage de la liste des utilisateurs demandee.\n", data->tid);
+                for(i = 0; i < taille; i++){
                     sprintf(mes, "%d.%s", utilisateurs[i].pid, utilisateurs[i].pseudo);
                     nbecr = ecrireLigne(data->canal, mes);
                     if (nbecr == -1) {
@@ -97,15 +98,20 @@ void *traiterRequete(void *arg) {
                             erreur("ligne trop longue\n");
                         }
                         else if (nblus == 0) {
-                            continue;
                         }
                         else {
-                            if(strcmp(texte, "OK")){
+                            if(strcmp(texte, "OK") == 0){
                                 reception = VRAI;
                             }
                         }
                     }
                 }
+                nbecr = ecrireLigne(data->canal, "FIN\n");
+                if (nbecr == -1) {
+                    erreur_IO("ecrireLigne");
+                    arret = VRAI;
+                }
+
             }
             else {
             	ecrireLog();
@@ -207,11 +213,10 @@ int main(int argc, char *argv[]) {
 
 
 void ajouterPseudo(char *texte, int tid){
-    int l;
-    l = NELEMS(utilisateurs);
-    utilisateurs = realloc(utilisateurs, sizeof(utilisateurs[0])*l+1);
-    strcpy(utilisateurs[l].pseudo, texte);
-    utilisateurs[l].pid = tid;
+    utilisateurs = realloc(utilisateurs, sizeof(utilisateurs[0])+1);
+    strcpy(utilisateurs[taille].pseudo, texte);
+    utilisateurs[taille].pid = tid;
+    taille = taille + 1;
 }
 
 char *printTime(void){

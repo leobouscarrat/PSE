@@ -1,10 +1,12 @@
 #include "pse.h"
+#define NELEMS(x)  (sizeof(x) / sizeof((x)[0]))
 
 int journal;
 int *utilisateurs;
 
 
 void *traiterRequete(void *arg);
+void ajouterPseudo(char *texte, int tid);
 
 void *traiterRequete(void *arg) {
     DataSpec * data = (DataSpec *) arg;
@@ -27,6 +29,7 @@ void *traiterRequete(void *arg) {
             continue;
         }
         else {
+            ajouterPseudo(texte, data->tid);
         }
     }
     while (arret == FAUX) {
@@ -79,7 +82,9 @@ int main(int argc, char *argv[]) {
     socklen_t receptionlen = sizeof(reception);
     DataThread *data;
     short port;
-  
+    
+    utilisateurs = malloc(0);
+
     if (argc != 2) {
         erreur("usage: %s port\n", argv[0]);
     }
@@ -148,4 +153,12 @@ int main(int argc, char *argv[]) {
     libererDataThread();
 
     exit(EXIT_SUCCESS);
+}
+
+
+void ajouterPseudo(char *texte, int tid){
+    l = NELEMS(utilisateurs);
+    utilisateurs = realloc(utilisateurs, sizeof(utilisateurs[0]*l+1));
+    utilisateurs[0].pseudo = texte;
+    utilisateurs[0].pid = tid;
 }

@@ -2,7 +2,7 @@
 #define NELEMS(x)  (sizeof(x) / sizeof((x)[0]))
 
 int journal;
-int *utilisateurs;
+struct user *utilisateurs;
 
 
 void *traiterRequete(void *arg);
@@ -17,22 +17,22 @@ void *traiterRequete(void *arg) {
 
     /*Dans un premier temps nous allons enregistrer le pseudo et voir
     si il n'existe pas déjà*/
-    while (pseudo == FAUX){
-        nblus = lireLigne (data->canal, texte);
-        if (nblus == -1) {
-            erreur_IO("lireLigne");
-        }
-        else if (nblus == LIGNE_MAX) {
-            erreur("ligne trop longue\n");
-        }
-        else if (nblus == 0) {
-            continue;
-        }
-        else {
-            ajouterPseudo(texte, data->tid);
-        }
-    }
+    
     while (arret == FAUX) {
+        while (pseudo == FAUX){
+            nblus = lireLigne (data->canal, texte);
+            if (nblus == -1) {
+                erreur_IO("lireLigne");
+            }
+            else if (nblus == LIGNE_MAX) {
+                erreur("ligne trop longue\n");
+            }
+            else {
+                ajouterPseudo(texte, data->tid);
+                printf("worker%d: Vous etes enregistre, votre id est %d\n", data->tid, data->tid);
+                pseudo = VRAI;
+            }
+        }
         nblus = lireLigne (data->canal, texte);
         if (nblus == -1) {
             erreur_IO("lireLigne");
@@ -157,8 +157,9 @@ int main(int argc, char *argv[]) {
 
 
 void ajouterPseudo(char *texte, int tid){
+    int l;
     l = NELEMS(utilisateurs);
-    utilisateurs = realloc(utilisateurs, sizeof(utilisateurs[0]*l+1));
-    utilisateurs[0].pseudo = texte;
+    utilisateurs = realloc(utilisateurs, sizeof(utilisateurs[0])*l+1);
+    strcpy(utilisateurs[0].pseudo, texte);
     utilisateurs[0].pid = tid;
 }

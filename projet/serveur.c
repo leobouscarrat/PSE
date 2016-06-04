@@ -4,9 +4,10 @@
 int journal;
 struct user *utilisateurs;
 
-
+char *printTime(void); // La fonction permet de renvoyer une chaine de caractère du temps 
+void ecrireLog(void);
 void *traiterRequete(void *arg);
-void ajouterPseudo(char *texte, int tid);
+void ajouterPseudo(char *texte, int tid); // la fonction ajoute un Pseudo à la liste des utilisateurs
 
 void *traiterRequete(void *arg) {
     DataSpec * data = (DataSpec *) arg;
@@ -29,7 +30,10 @@ void *traiterRequete(void *arg) {
             }
             else {
                 ajouterPseudo(texte, data->tid);
-                printf("worker%d: Vous etes enregistre, votre id est %d\n", data->tid, data->tid);
+                printf("worker%d enregistré, l'id est %d et pseudo est %s \n", data->tid, data->tid, texte);
+                sprintf(texte,"Connexion d'un nouvel utilisateur : %s",utilisateurs[0].pseudo);
+                ecrireLog();
+                ecrireLigne(journal, texte);
                 pseudo = VRAI;
             }
         }
@@ -44,12 +48,12 @@ void *traiterRequete(void *arg) {
             continue;
         }
         else {
-            if (strcmp(texte, "fin") == 0) {
+            if (strcmp(texte, "/fin") == 0) {
 	           printf("worker%d: arret demande.\n", data->tid);
 	           arret = VRAI;
 	           continue;
             }
-            else if (strcmp(texte, "init") == 0) {
+            else if (strcmp(texte, "/init") == 0) {
 	           printf("worker%d: remise a zero du journal demandee.\n", data->tid);
 	           if (close(journal) == -1) {
 	               erreur_IO("close journal");
@@ -60,11 +64,9 @@ void *traiterRequete(void *arg) {
 	            }
             }
             else {
-	            if (ecrireLigne(journal, texte) == -1) {
-	                erreur_IO("ecrireLigne");
-	            }
-	            printf("worker%d: ligne de %d octets ecrite dans le journal.\n", 
-	            data->tid, nblus);
+            	ecrireLog();
+	            ecrireLigne(journal, texte);
+	            printf("worker%d: ligne de %d octets ecrite dans le journal.\n", data->tid, nblus);
 	            fflush(stdout);
             }
         }
@@ -76,13 +78,13 @@ void *traiterRequete(void *arg) {
     pthread_exit(NULL);
 }
 
+
 int main(int argc, char *argv[]) {
     int ecoute, canal, ret, mode, numthread = 0;
     struct sockaddr_in adrEcoute, reception;
     socklen_t receptionlen = sizeof(reception);
     DataThread *data;
     short port;
-    
     utilisateurs = malloc(0);
 
     if (argc != 2) {
@@ -162,4 +164,33 @@ void ajouterPseudo(char *texte, int tid){
     utilisateurs = realloc(utilisateurs, sizeof(utilisateurs[0])*l+1);
     strcpy(utilisateurs[0].pseudo, texte);
     utilisateurs[0].pid = tid;
+}
+
+char *printTime(void){
+
+	time_t temps;
+
+    struct tm date;
+
+
+    time(&temps);
+
+    date=*localtime(&temps);
+
+	return asctime(&date);
+}
+
+void ecrireLog(void){
+
+	char temps[LIGNE_MAX];
+
+    sprintf(temps,"%s\n",printTime());
+
+    if (ecrireLigne(journal, "---------------------------------------------\n") == -1) {
+	    erreur_IO("ecrireLigne");
+	}
+    if (ecrireLigne(journal, temps) == -1) {
+	    erreur_IO("ecrireLigne");
+	}
+
 }

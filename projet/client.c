@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
 	      	if (nbecr == -1) {
 				erreur_IO("ecrireLigne");
 	      	}
-	      	if (strcmp(texte, "fin\n") == 0) {
+	      	if (strcmp(texte, "/fin\n") == 0) {
 				printf("Client. arret demande.\n");
 				arret = VRAI;
 	      	}

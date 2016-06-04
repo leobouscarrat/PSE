@@ -206,4 +206,3 @@ void ecrireLog(void){
 	}
 
 }
->>>>>>> 29b8ff68dd3e6678cf2963bc4b1447449c58575a

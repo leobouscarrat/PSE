@@ -62,8 +62,12 @@ void *traiterRequete(void *arg) {
 	           printf("worker%d: arret demande.\n", data->tid);
 	           ecrireLog();
 	           sprintf(nom,"L'utilisateur %s s'est déconnecté",utilisateurs[data->tid-1].pseudo);
+<<<<<<< HEAD
+	           if (ecrireLigne(journal, nom) == -1) {
+=======
 	           nblus = ecrireLigne(journal, nom);
                if (nblus == -1) {
+>>>>>>> a1c275ae5c5a2cddc4cbeba9b35fbf2b3b77e6e9
 	    			erreur_IO("ecrireLigne");
 					}
 	           arret = VRAI;
@@ -222,12 +226,9 @@ void ajouterPseudo(char *texte, int tid){
 char *printTime(void){
 
 	time_t temps;
-
     struct tm date;
 
-
     time(&temps);
-
     date=*localtime(&temps);
 
 	return asctime(&date);
@@ -239,7 +240,7 @@ void ecrireLog(void){
 
     sprintf(temps,"%s\n",printTime());
 
-    if (ecrireLigne(journal, "---------------------------------------------\n") == -1) {
+    if (ecrireLigne(journal, "--------------------------------------------------------------------------------\n") == -1) {
 	    erreur_IO("ecrireLigne");
 	}
     if (ecrireLigne(journal, temps) == -1) {

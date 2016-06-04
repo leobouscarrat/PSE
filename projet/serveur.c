@@ -11,8 +11,9 @@ void ajouterPseudo(char *texte, int tid); // la fonction ajoute un Pseudo à la 
 
 void *traiterRequete(void *arg) {
     DataSpec * data = (DataSpec *) arg;
-    int arret = FAUX, nblus, mode, pseudo = FAUX, nbecr;
-    char texte[LIGNE_MAX], mes[LIGNE_MAX], nom[LIGNE_MAX];
+    int arret = FAUX, nblus, mode, pseudo = FAUX, nbecr, i;
+    char texte[LIGNE_MAX], mes[LIGNE_MAX],nom[LIGNE_MAX];
+
   
     mode = O_WRONLY | O_APPEND | O_CREAT | O_TRUNC;
 
@@ -77,6 +78,15 @@ void *traiterRequete(void *arg) {
 	            if (journal == -1) {
 	               erreur_IO("open trunc journal");
 	            }
+            }
+            else if (strcmp(texte, "1") == 0){
+                for(i = 0; i < NELEMS(utilisateurs); i++){
+                    nbecr = ecrireLigne(data->canal, mes);
+                    if (nbecr == -1) {
+                        erreur_IO("ecrireLigne");
+                        arret = VRAI;
+                    }
+                }
             }
             else {
             	ecrireLog();

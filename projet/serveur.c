@@ -12,7 +12,7 @@ void ajouterPseudo(char *texte, int tid); // la fonction ajoute un Pseudo à la 
 void *traiterRequete(void *arg) {
     DataSpec * data = (DataSpec *) arg;
     int arret = FAUX, nblus, mode, pseudo = FAUX, nbecr, i, reception = FAUX;
-    char texte[LIGNE_MAX], mes[LIGNE_MAX];
+    char texte[LIGNE_MAX], mes[LIGNE_MAX],nom[LIGNE_MAX];
   
     mode = O_WRONLY | O_APPEND | O_CREAT | O_TRUNC;
 
@@ -30,8 +30,15 @@ void *traiterRequete(void *arg) {
             }
             else {
                 ajouterPseudo(texte, data->tid);
-                printf("worker%d enregistré, l'id est %d et pseudo est %s \n", data->tid, data->tid, texte);
+                printf("worker%d enregistré, l'id est %d et le pseudo est %s \n", data->tid, data->tid, texte);
                 sprintf(mes, "Vous etes enregistre en tant que %s, votre id est %d\n", texte, data->tid);
+                ecrireLog();
+                if(ecrireLigne(journal,"Connexion d'un nouvel utilisateur : \n") == -1) {
+	    			erreur_IO("ecrireLigne");
+					}
+                if (ecrireLigne(journal, texte) == -1) {
+	    			erreur_IO("ecrireLigne");
+					}
                 nbecr = ecrireLigne(data->canal, mes);
                 if (nbecr == -1) {
                     erreur_IO("ecrireLigne");
@@ -53,6 +60,12 @@ void *traiterRequete(void *arg) {
         else {
             if (strcmp(texte, "/fin") == 0) {
 	           printf("worker%d: arret demande.\n", data->tid);
+	           ecrireLog();
+	           sprintf(nom,"L'utilisateur %s s'est déconnecté",utilisateurs[data->tid-1].pseudo);
+	           nblus = ecrireLigne(journal, nom);
+               if (nblus == -1) {
+	    			erreur_IO("ecrireLigne");
+					}
 	           arret = VRAI;
 	           continue;
             }

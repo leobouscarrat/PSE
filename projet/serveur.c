@@ -11,7 +11,7 @@ void ajouterPseudo(char *texte, int tid); // la fonction ajoute un Pseudo à la 
 
 void *traiterRequete(void *arg) {
     DataSpec * data = (DataSpec *) arg;
-    int arret = FAUX, nblus, mode, pseudo = FAUX, nbecr, i;
+    int arret = FAUX, nblus, mode, pseudo = FAUX, nbecr, i, reception = FAUX;
     char texte[LIGNE_MAX], mes[LIGNE_MAX];
   
     mode = O_WRONLY | O_APPEND | O_CREAT | O_TRUNC;
@@ -68,16 +68,39 @@ void *traiterRequete(void *arg) {
             }
             else if (strcmp(texte, "1") == 0){
                 for(i = 0; i < NELEMS(utilisateurs); i++){
+                    sprintf(mes, "%d.%s", utilisateurs[i].pid, utilisateurs[i].pseudo);
                     nbecr = ecrireLigne(data->canal, mes);
                     if (nbecr == -1) {
                         erreur_IO("ecrireLigne");
                         arret = VRAI;
                     }
+                    reception = FAUX;
+                    while(reception == FAUX){
+                        nblus = lireLigne(data->canal, texte);
+                        if (nblus == -1) {
+                            erreur_IO("lireLigne");
+                        }
+                        else if (nblus == LIGNE_MAX) {
+                            erreur("ligne trop longue\n");
+                        }
+                        else if (nblus == 0) {
+                            continue;
+                        }
+                        else {
+                            if(strcmp(texte, "OK")){
+                                reception = VRAI;
+                            }
+                        }
+                    }
                 }
             }
             else {
             	ecrireLog();
-	            ecrireLigne(journal, texte);
+	            nbecr = ecrireLigne(journal, texte);
+                 if (nbecr == -1) {
+                    erreur_IO("ecrireLigne");
+                    arret = VRAI;
+                }
 	            printf("worker%d: ligne de %d octets ecrite dans le journal.\n", data->tid, nblus);
 	            fflush(stdout);
             }

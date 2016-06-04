@@ -2,6 +2,8 @@
 
 #define CMD   "client"
 
+void menu(void);
+
 int main(int argc, char *argv[]) {
   	int sock, arret = FAUX, ret, nbecr;
   	struct sockaddr_in *sa;
@@ -50,10 +52,9 @@ int main(int argc, char *argv[]) {
 	 	}
 		printf("Nom enregistré par le serveur\n");
 	}
- 
-  
 
   	while (arret == FAUX) {
+  		menu();
 	    printf("ligne> ");
 	    if (fgets(texte, LIGNE_MAX, stdin) == NULL) {
 	      printf("Fin de fichier (ou erreur) : arret.\n");
@@ -76,4 +77,19 @@ int main(int argc, char *argv[]) {
   	}
 
   	exit(EXIT_SUCCESS);
+}
+
+void menu (void)
+{
+	printf(" ----------------------------------------\n");
+	printf("|                  Menu                  |\n");
+	printf("|                                        |\n");
+	printf("|                                        |\n");
+	printf("| 1. Afficher la liste des utilisateurs  |\n");
+	printf("| 2. Envoyer un message à un utilisateur |\n");
+	printf("| 3. Envoyer un fichier a un utilisateur |\n");
+	printf("| Q. Se deconnecter                      |\n");
+	printf("|                                        |\n");
+	printf(" ----------------------------------------\n");
+	
 }

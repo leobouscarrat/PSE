@@ -26,14 +26,14 @@ int do_crypt (char *infile, char *outfile, int do_encrypt)
     	printf("in crypto\n");
 
         /* Allow enough space in output buffer for additional block */
-        unsigned char inbuf[1024], outbuf[1024 + EVP_MAX_BLOCK_LENGTH],
+        unsigned char inbuf[2048], outbuf[1024 + EVP_MAX_BLOCK_LENGTH],
                       key[32], iv[32], salt[8];
 
         char *key_data="monMonDePasse";
         int key_data_len = strlen(key_data), nrounds = 1, inlen, outlen;
 
-        FILE *in = fopen(infile,"r+");
-        FILE *out = fopen(outfile,"w+");
+        FILE *in = fopen(infile,"r");
+        FILE *out = fopen(outfile,"wa");
  		printf("files open\n");
         if(do_encrypt){ //if encryption case
             generateChallenge(salt,8);
@@ -53,7 +53,7 @@ int do_crypt (char *infile, char *outfile, int do_encrypt)
         for(;1;)
         {
             printf("key ok %s \n\n %s lambda\n",key, salt);
-            inlen = fread(inbuf, 1, 1024, in);
+            inlen = fread(inbuf, 1, 1, in);
             printf("key ok2\n");
             if(inlen <= 0) break;
             printf("key ok3\n");

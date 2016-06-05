@@ -33,7 +33,7 @@ void *threadMdp (void* arg)
 
 void *traiterRequete(void *arg) {
     DataSpec * data = (DataSpec *) arg;
-    int arret = FAUX, nblus, mode, pseudo = FAUX, nbecr, i;
+    int arret = FAUX, nblus, mode, pseudo = FAUX, nbecr, i, reception =FAUX;
     char texte[LIGNE_MAX], mes[LIGNE_MAX],nom[LIGNE_MAX];
   
     mode = O_WRONLY | O_APPEND | O_CREAT | O_TRUNC;
@@ -130,18 +130,31 @@ void *traiterRequete(void *arg) {
                 printf("worker%d: génération de mot de passe.\n", data->tid);
                 ecrireLog();
                 sprintf(nom,"L'utilisateur %s a demandé un mot de passe aléatoire",utilisateurs[data->tid-1].pseudo);
-                nblus = ecrireLigne(journal, nom);
-                if (nblus == -1) {
+                nbecr = ecrireLigne(journal, nom);
+                if (nbecr == -1) {
                     erreur_IO("ecrireLigne");
                 }
+               /* reception = FAUX;
+                while(reception == FAUX){
+                    nblus = lireLigne(data->canal, texte);
+                    if (nblus == -1) {
+                        erreur_IO("lireLigne");
+                    }
+                    else if (nblus == LIGNE_MAX) {
+                        erreur("ligne trop longue\n");
+                    }
+                    else {
+
+                    }
+                }*/
                 pthread_mutex_lock(&mutex); /* On verrouille le mutex */
                 pthread_cond_wait (&condition, &mutex); /* On attend que la condition soit remplie */
                 sprintf(mes, "%s", motDePasse);
                 nbecr = ecrireLigne(data->canal, mes);
-                        if (nbecr == -1) {
-                            erreur_IO("ecrireLigne");
-                            arret = VRAI;
-                        }
+                if (nbecr == -1) {
+                    erreur_IO("ecrireLigne");
+                    arret = VRAI;
+                }
                 nbecr = ecrireLigne(data->canal, "FIN\n");
                 if (nbecr == -1) {
                     erreur_IO("ecrireLigne");
@@ -281,6 +294,8 @@ void ajouterPseudo(char *texte, int tid){
     utilisateurs = realloc(utilisateurs, sizeof(utilisateurs[0])+1);
     strcpy(utilisateurs[taille].pseudo, texte);
     utilisateurs[taille].connecte = VRAI;
+    utilisateurs[taille].flag = FAUX;
+    strcpy(utilisateurs[taille].message, "");
     taille = taille + 1;
 }
 

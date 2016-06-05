@@ -98,10 +98,6 @@ int main(int argc, char *argv[]) {
 		            	}
 		            	else {
 			            	printf("%s\n", texte);
-			            	nbecr = ecrireLigne(sock, "OK\n");
-			            	if (nbecr == -1) {
-								erreur_IO("ecrireLigne");
-			      			}
 			      		}
 		      		}
 	            }

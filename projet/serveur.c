@@ -11,13 +11,12 @@ void ajouterPseudo(char *texte, int tid); // la fonction ajoute un Pseudo à la 
 
 void *traiterRequete(void *arg) {
     DataSpec * data = (DataSpec *) arg;
-    int arret = FAUX, nblus, mode, pseudo = FAUX, nbecr, i, reception = FAUX;
+    int arret = FAUX, nblus, mode, pseudo = FAUX, nbecr, i;
     char texte[LIGNE_MAX], mes[LIGNE_MAX],nom[LIGNE_MAX];
   
     mode = O_WRONLY | O_APPEND | O_CREAT | O_TRUNC;
 
-    /*Dans un premier temps nous allons enregistrer le pseudo et voir
-    si il n'existe pas déjà*/
+    /*Dans un premier temps nous allons enregistrer le pseudo*/
     
     while (arret == FAUX) {
         while (pseudo == FAUX){
@@ -87,23 +86,6 @@ void *traiterRequete(void *arg) {
                     if (nbecr == -1) {
                         erreur_IO("ecrireLigne");
                         arret = VRAI;
-                    }
-                    reception = FAUX;
-                    while(reception == FAUX){
-                        nblus = lireLigne(data->canal, texte);
-                        if (nblus == -1) {
-                            erreur_IO("lireLigne");
-                        }
-                        else if (nblus == LIGNE_MAX) {
-                            erreur("ligne trop longue\n");
-                        }
-                        else if (nblus == 0) {
-                        }
-                        else {
-                            if(strcmp(texte, "OK") == 0){
-                                reception = VRAI;
-                            }
-                        }
                     }
                 }
                 nbecr = ecrireLigne(data->canal, "FIN\n");

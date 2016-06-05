@@ -8,6 +8,7 @@ char *printTime(void); // La fonction permet de renvoyer une chaine de caractèr
 void ecrireLog(void);
 void *traiterRequete(void *arg);
 void ajouterPseudo(char *texte, int tid); // la fonction ajoute un Pseudo à la liste des utilisateurs
+void deconnexion(int tid);
 void generateMdp(char*);
 
 void *traiterRequete(void *arg) {
@@ -84,16 +85,18 @@ void *traiterRequete(void *arg) {
                 ecrireLog();
                 sprintf(nom,"L'utilisateur %s a demandé l'affichage de la liste des users",utilisateurs[data->tid-1].pseudo);
                 nblus = ecrireLigne(journal, nom);
-               if (nblus == -1) {
+                if (nblus == -1) {
                     erreur_IO("ecrireLigne");
-                    }
+                }
 
                 for(i = 0; i < taille; i++){
-                    sprintf(mes, "%d.%s", utilisateurs[i].pid, utilisateurs[i].pseudo);
-                    nbecr = ecrireLigne(data->canal, mes);
-                    if (nbecr == -1) {
-                        erreur_IO("ecrireLigne");
-                        arret = VRAI;
+                    if(utilisateurs[i].connecte){
+                        sprintf(mes, "%d.%s", i+1, utilisateurs[i].pseudo);
+                        nbecr = ecrireLigne(data->canal, mes);
+                        if (nbecr == -1) {
+                            erreur_IO("ecrireLigne");
+                            arret = VRAI;
+                        }
                     }
                 }
                 nbecr = ecrireLigne(data->canal, "FIN\n");
@@ -118,6 +121,7 @@ void *traiterRequete(void *arg) {
     if (close(data->canal) == -1) {
         erreur_IO("close");
     }
+    deconnexion(data->tid);
     data->libre = VRAI; /* indique au main que le thread a fini */
     pthread_exit(NULL);
 }
@@ -205,8 +209,12 @@ int main(int argc, char *argv[]) {
 void ajouterPseudo(char *texte, int tid){
     utilisateurs = realloc(utilisateurs, sizeof(utilisateurs[0])+1);
     strcpy(utilisateurs[taille].pseudo, texte);
-    utilisateurs[taille].pid = tid;
+    utilisateurs[taille].connecte = VRAI;
     taille = taille + 1;
+}
+
+void deconnexion(int tid){
+    utilisateurs[tid-1].connecte = FAUX;
 }
 
 char *printTime(void){

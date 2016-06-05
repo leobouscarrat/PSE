@@ -7,7 +7,7 @@ Création d'une structure particuliere pour enregistrer les utilisateurs
 
 struct user{
 	char pseudo[50];
-	int pid;
+	int connecte;
 }user;
 
 #endif

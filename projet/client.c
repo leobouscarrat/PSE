@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
 			      		}
 		      		}
 	            }
-	            printf("Appuyez sur une touche pour revenir au menu\n");
+	            printf("Appuyez sur la touche entrée pour revenir au menu\n");
 	            getchar();
 	      	}
 	     	else {

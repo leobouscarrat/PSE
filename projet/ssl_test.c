@@ -20,9 +20,9 @@ void generateChallenge(unsigned char *challenge,int chl_size){
 }
 
 //fonction pour chiffrer/déchiffrer
-int crypto(int mode)
+int crypto(int mode, char* password)
     {
-        char *key_data="Password";
+        char *key_data=password;
 
         /* Allow enough space in output buffer for additional block */
         unsigned char inbuf[1024], outbuf[1024 + EVP_MAX_BLOCK_LENGTH],
@@ -117,12 +117,13 @@ int crypto(int mode)
 int main(void)
 {
     int mode;
-    //char* password[50];
+    char password[50];
+    printf("\nEntrez un password: \n");
+    fgets(password, sizeof(password), stdin);
     printf("Entrez un chiffre : pour le cryptage => 0 ou  pour le decryptage => 1\n");
     scanf("%d",&mode);
-    //printf("\nEntrez un password: \n");
-    //scanf("%s",&password);
-    crypto(mode);
+    printf("\n Programme en cours ... \n");
+    crypto(mode,password);
     return 0;
 }
 

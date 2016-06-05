@@ -7,6 +7,6 @@ PSE_INCL_DIR = ${PSE_DIR}/include
 
 CFLAGS = -g -I. -I${PSE_INCL_DIR} -Wall 
 		
-LDLIBS = -L${PSE_LIB} -lpse -lm -pthread
+LDLIBS = -L${PSE_LIB} -lpse -lm -pthread -lcrypto
 
 CC = gcc

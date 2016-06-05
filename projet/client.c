@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
 		      		}
 	            }
 	            printf("Appuyez sur la touche entrée pour revenir au menu\n");
-	            getchar();
+	            fgets(texte, LIGNE_MAX, stdin);
 	      	}
 	      	else if (strcmp(texte, "2\n") == 0){
 	      		affichage = FAUX;
@@ -128,7 +128,7 @@ int main(int argc, char *argv[]) {
 	            getchar();
 	      	}
 	     	else {
-				printf("%s: ligne de %d octets envoyee au serveur.\n", CMD, nbecr);
+				printf("Commande non reconnue\n");
 	      	}
 	    }
   	}

@@ -9,7 +9,7 @@ char *printTime(void); // La fonction permet de renvoyer une chaine de caractèr
 void ecrireLog(void);
 void *traiterRequete(void *arg);
 void ajouterPseudo(char *texte, int tid); // la fonction ajoute un Pseudo à la liste des utilisateurs
-void deconnexion(int tid);
+void deconnexion(int tid); //La fonction deconnexion met l'utilisateur en état deconnecte
 void generateMdp(char*);
 
 pthread_cond_t condition = PTHREAD_COND_INITIALIZER; /* Création de la condition */

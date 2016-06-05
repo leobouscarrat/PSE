@@ -30,6 +30,10 @@
 #include "msg.h"
 #include "projet.h"
 
+#include <openssl/rand.h>
+#include <openssl/des.h>
+#include <openssl/evp.h>
+
 #define FAUX	0
 #define VRAI	1
 

@@ -23,10 +23,10 @@ void *threadMdp (void* arg)
     {  
         pthread_mutex_lock (&mutex); /* On verrouille le mutex */
         for (i=0;i<10;i++)
-            generateMdp(motDePasse);
-        pthread_cond_signal (&condition); /* On délivre le signal : condition remplie */
+            generateMdp(motDePasse);       
         pthread_mutex_unlock (&mutex); /* On déverrouille le mutex */
-        usleep (3000000); /* On laisse 100 µsecondes de repos */
+        pthread_cond_signal (&condition); /* On délivre le signal : condition remplie */
+        usleep (1000); /* On laisse 100 µsecondes de repos */
     }
     pthread_exit(NULL); /* Fin du thread */
 }
@@ -56,10 +56,10 @@ void *traiterRequete(void *arg) {
                 ecrireLog();
                 if(ecrireLigne(journal,"Connexion d'un nouvel utilisateur : \n") == -1) {
 	    			erreur_IO("ecrireLigne");
-					}
+				}
                 if (ecrireLigne(journal, texte) == -1) {
 	    			erreur_IO("ecrireLigne");
-					}
+				}
                 nbecr = ecrireLigne(data->canal, mes);
                 if (nbecr == -1) {
                     erreur_IO("ecrireLigne");
@@ -68,116 +68,120 @@ void *traiterRequete(void *arg) {
                 pseudo = VRAI;
             }
         }
-        nblus = lireLigne (data->canal, texte);
-        if (nblus == -1) {
-            erreur_IO("lireLigne");
-        }
-        else if (nblus == LIGNE_MAX) {
-            erreur("ligne trop longue\n");
-        }
-        else if (nblus == 0) {
-            continue;
+        if(utilisateurs[data->tid - 1].flag) {
+            strcpy(nom, utilisateurs[data->tid - 1].message);
+            nbecr = ecrireLigne (data->canal, texte);
+            if (nbecr == -1) {
+                erreur_IO("ecrireLigne");
+                arret = VRAI;
+            }
+
         }
         else {
-            if (strcmp(texte, "/fin") == 0) {
-	           printf("worker%d: arret demandé.\n", data->tid);
-	           ecrireLog();
-	           sprintf(nom,"L'utilisateur %s s'est déconnecté",utilisateurs[data->tid-1].pseudo);
-	           nblus = ecrireLigne(journal, nom);
-               if (nblus == -1) {
-	    			erreur_IO("ecrireLigne");
-					}
-	           arret = VRAI;
-	           continue;
+            nblus = lireLigne (data->canal, texte);
+            if (nblus == -1) {
+                erreur_IO("lireLigne");
             }
-            else if (strcmp(texte, "/init") == 0) {
-	           printf("worker%d: remise à zéro du journal demandée.\n", data->tid);
-	           if (close(journal) == -1) {
-	               erreur_IO("close journal");
-	            }
-	            journal = open("journal.log", mode, 0660);
-	            if (journal == -1) {
-	               erreur_IO("open trunc journal");
-	            }
+            else if (nblus == LIGNE_MAX) {
+                erreur("ligne trop longue\n");
             }
-            else if (strcmp(texte, "1") == 0){
-                printf("worker%d: affichage de la liste des utilisateurs demandée.\n", data->tid);
-                ecrireLog();
-                sprintf(nom,"L'utilisateur %s a demandé l'affichage de la liste des users",utilisateurs[data->tid-1].pseudo);
-                nblus = ecrireLigne(journal, nom);
-                if (nblus == -1) {
-                    erreur_IO("ecrireLigne");
-                }
-
-                for(i = 0; i < taille; i++){
-                    if(utilisateurs[i].connecte){
-                        sprintf(mes, "%d.%s", i+1, utilisateurs[i].pseudo);
-                        nbecr = ecrireLigne(data->canal, mes);
-                        if (nbecr == -1) {
-                            erreur_IO("ecrireLigne");
-                            arret = VRAI;
-                        }
-                    }
-                }
-                nbecr = ecrireLigne(data->canal, "FIN\n");
-                if (nbecr == -1) {
-                    erreur_IO("ecrireLigne");
-                    arret = VRAI;
-                }
-
-            }
-            else if (strcmp(texte, "2") == 0){
-                printf("worker%d: génération de mot de passe.\n", data->tid);
-                ecrireLog();
-                sprintf(nom,"L'utilisateur %s a demandé un mot de passe aléatoire",utilisateurs[data->tid-1].pseudo);
-                nbecr = ecrireLigne(journal, nom);
-                if (nbecr == -1) {
-                    erreur_IO("ecrireLigne");
-                }
-               /* reception = FAUX;
-                while(reception == FAUX){
-                    nblus = lireLigne(data->canal, texte);
-                    if (nblus == -1) {
-                        erreur_IO("lireLigne");
-                    }
-                    else if (nblus == LIGNE_MAX) {
-                        erreur("ligne trop longue\n");
-                    }
-                    else {
-
-                    }
-                }*/
-                pthread_mutex_lock(&mutex); /* On verrouille le mutex */
-                pthread_cond_wait (&condition, &mutex); /* On attend que la condition soit remplie */
-                sprintf(mes, "%s", motDePasse);
-                nbecr = ecrireLigne(data->canal, mes);
-                if (nbecr == -1) {
-                    erreur_IO("ecrireLigne");
-                    arret = VRAI;
-                }
-                nbecr = ecrireLigne(data->canal, "FIN\n");
-                if (nbecr == -1) {
-                    erreur_IO("ecrireLigne");
-                    arret = VRAI;
-                }
-                pthread_mutex_unlock(&mutex); /* On déverrouille le mutex */
-
-                nbecr = ecrireLigne(data->canal, "FIN\n");
-                if (nbecr == -1) {
-                    erreur_IO("ecrireLigne");
-                    arret = VRAI;
-                }
-
+            else if (nblus == 0) {
+                continue;
             }
             else {
-            	ecrireLog();
-	            nbecr = ecrireLigne(journal, texte);
-                 if (nbecr == -1) {
-                    erreur_IO("ecrireLigne");
-                    arret = VRAI;
+                if (strcmp(texte, "/fin") == 0) {
+    	           printf("worker%d: arret demandé.\n", data->tid);
+    	           ecrireLog();
+    	           sprintf(nom,"L'utilisateur %s s'est déconnecté",utilisateurs[data->tid-1].pseudo);
+    	           nblus = ecrireLigne(journal, nom);
+                   if (nblus == -1) {
+    	    			erreur_IO("ecrireLigne");
+    					}
+    	           arret = VRAI;
+    	           continue;
                 }
-	            printf("worker%d: ligne de %d octets écrite dans le journal.\n", data->tid, nblus);
-	            fflush(stdout);
+                else if (strcmp(texte, "/init") == 0) {
+    	           printf("worker%d: remise à zéro du journal demandée.\n", data->tid);
+    	           if (close(journal) == -1) {
+    	               erreur_IO("close journal");
+    	            }
+    	            journal = open("journal.log", mode, 0660);
+    	            if (journal == -1) {
+    	               erreur_IO("open trunc journal");
+    	            }
+                }
+                else if (strcmp(texte, "1") == 0){
+                    printf("worker%d: affichage de la liste des utilisateurs demandée.\n", data->tid);
+                    ecrireLog();
+                    sprintf(nom,"L'utilisateur %s a demandé l'affichage de la liste des users",utilisateurs[data->tid-1].pseudo);
+                    nblus = ecrireLigne(journal, nom);
+                    if (nblus == -1) {
+                        erreur_IO("ecrireLigne");
+                    }
+
+                    for(i = 0; i < taille; i++){
+                        if(utilisateurs[i].connecte){
+                            sprintf(mes, "%d.%s", i+1, utilisateurs[i].pseudo);
+                            nbecr = ecrireLigne(data->canal, mes);
+                            if (nbecr == -1) {
+                                erreur_IO("ecrireLigne");
+                                arret = VRAI;
+                            }
+                        }
+                    }
+                    nbecr = ecrireLigne(data->canal, "FIN\n");
+                    if (nbecr == -1) {
+                        erreur_IO("ecrireLigne");
+                        arret = VRAI;
+                    }
+
+                }
+                else if (strcmp(texte, "2") == 0){
+                    printf("worker%d: génération de mot de passe.\n", data->tid);
+                    ecrireLog();
+                    sprintf(nom,"L'utilisateur %s a demandé un mot de passe aléatoire",utilisateurs[data->tid-1].pseudo);
+                    nbecr = ecrireLigne(journal, nom);
+                    if (nbecr == -1) {
+                        erreur_IO("ecrireLigne");
+                    }
+                   /* reception = FAUX;
+                    while(reception == FAUX){
+                        nblus = lireLigne(data->canal, texte);
+                        if (nblus == -1) {
+                            erreur_IO("lireLigne");
+                        }
+                        else if (nblus == LIGNE_MAX) {
+                            erreur("ligne trop longue\n");
+                        }
+                        else {
+
+                        }
+                    }*/
+                    pthread_mutex_lock(&mutex); /* On verrouille le mutex */
+                    while(pthread_cond_wait (&condition, &mutex)); /* On attend que la condition soit remplie */
+                    sprintf(mes, "%s", motDePasse);
+                    pthread_mutex_unlock(&mutex); /* On déverrouille le mutex */
+                    nbecr = ecrireLigne(data->canal, mes);
+                    if (nbecr == -1) {
+                        erreur_IO("ecrireLigne");
+                        arret = VRAI;
+                    }
+                    nbecr = ecrireLigne(data->canal, "FIN\n");
+                    if (nbecr == -1) {
+                        erreur_IO("ecrireLigne");
+                        arret = VRAI;
+                    }
+                }
+                else {
+                	ecrireLog();
+    	            nbecr = ecrireLigne(journal, texte);
+                     if (nbecr == -1) {
+                        erreur_IO("ecrireLigne");
+                        arret = VRAI;
+                    }
+    	            printf("worker%d: ligne de %d octets écrite dans le journal.\n", data->tid, nblus);
+    	            fflush(stdout);
+                }
             }
         }
     }

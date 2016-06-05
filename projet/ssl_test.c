@@ -113,17 +113,35 @@ int crypto(int mode, char* password)
 
         return 1;
     }
+void generateMdp(char* motDePasse)
+{
+    char password[120]="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890<>,?;.:/!§*µù$£¤¨+=})]à@ç^_`è|-[({'#é~&";
+    int max=101,i,alea;
+    srand(time(NULL));
+    for(i=0;i<64;i++)
+    {       
+        alea=rand()%(max);
+        motDePasse[i]=password[alea];
+    }   
+    motDePasse[65]='\0';
+    printf("le mdp est %s\n",motDePasse);
+}
 
 int main(void)
 {
     int mode;
-    char password[50];
-    printf("\nEntrez un password: \n");
-    fgets(password, sizeof(password), stdin);
     printf("Entrez un chiffre : pour le cryptage => 0 ou  pour le decryptage => 1\n");
     scanf("%d",&mode);
+    getchar();
+    char motDePasse[65];
+    if (mode == 0)
+        generateMdp(motDePasse);
+    else
+        //motDePasse
     printf("\n Programme en cours ... \n");
-    crypto(mode,password);
+    printf("\n Programme en cours ... \n");
+    crypto(mode,motDePasse);
+    printf("\n Programme fini... \n");
     return 0;
 }
 

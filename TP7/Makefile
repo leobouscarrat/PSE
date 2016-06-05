@@ -2,7 +2,7 @@
 #
 include ../Makefile.inc
 
-EXE = exercice1
+EXE = exercice1 exercice2 exercice3 exercice4
 
 all: ${EXE}
 

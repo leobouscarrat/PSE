@@ -3,6 +3,7 @@
 int journal;
 int taille=0;
 struct user *utilisateurs;
+char motDePasse[33];
 
 char *printTime(void); // La fonction permet de renvoyer une chaine de caractère du temps 
 void ecrireLog(void);
@@ -10,6 +11,25 @@ void *traiterRequete(void *arg);
 void ajouterPseudo(char *texte, int tid); // la fonction ajoute un Pseudo à la liste des utilisateurs
 void deconnexion(int tid);
 void generateMdp(char*);
+
+pthread_cond_t condition = PTHREAD_COND_INITIALIZER; /* Création de la condition */
+
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER; /* Création du mutex */
+
+void *threadMdp (void* arg)
+{
+    int i=0;
+    while(1) /* Boucle infinie */
+    {  
+        pthread_mutex_lock (&mutex); /* On verrouille le mutex */
+        for (i=0;i<10;i++)
+            generateMdp(motDePasse);
+        pthread_cond_signal (&condition); /* On délivre le signal : condition remplie */
+        pthread_mutex_unlock (&mutex); /* On déverrouille le mutex */
+        usleep (3000000); /* On laisse 100 µsecondes de repos */
+    }
+    pthread_exit(NULL); /* Fin du thread */
+}
 
 void *traiterRequete(void *arg) {
     DataSpec * data = (DataSpec *) arg;
@@ -32,7 +52,7 @@ void *traiterRequete(void *arg) {
             else {
                 ajouterPseudo(texte, data->tid);
                 printf("worker%d enregistré, l'id est %d et le pseudo est %s \n", data->tid, data->tid, texte);
-                sprintf(mes, "Vous etes enregistre en tant que %s, votre id est %d\n", texte, data->tid);
+                sprintf(mes, "Vous etes enregistré en tant que %s, votre id est %d\n", texte, data->tid);
                 ecrireLog();
                 if(ecrireLigne(journal,"Connexion d'un nouvel utilisateur : \n") == -1) {
 	    			erreur_IO("ecrireLigne");
@@ -60,7 +80,7 @@ void *traiterRequete(void *arg) {
         }
         else {
             if (strcmp(texte, "/fin") == 0) {
-	           printf("worker%d: arret demande.\n", data->tid);
+	           printf("worker%d: arret demandé.\n", data->tid);
 	           ecrireLog();
 	           sprintf(nom,"L'utilisateur %s s'est déconnecté",utilisateurs[data->tid-1].pseudo);
 	           nblus = ecrireLigne(journal, nom);
@@ -71,7 +91,7 @@ void *traiterRequete(void *arg) {
 	           continue;
             }
             else if (strcmp(texte, "/init") == 0) {
-	           printf("worker%d: remise a zero du journal demandee.\n", data->tid);
+	           printf("worker%d: remise à zéro du journal demandée.\n", data->tid);
 	           if (close(journal) == -1) {
 	               erreur_IO("close journal");
 	            }
@@ -81,7 +101,7 @@ void *traiterRequete(void *arg) {
 	            }
             }
             else if (strcmp(texte, "1") == 0){
-                printf("worker%d: affichage de la liste des utilisateurs demandee.\n", data->tid);
+                printf("worker%d: affichage de la liste des utilisateurs demandée.\n", data->tid);
                 ecrireLog();
                 sprintf(nom,"L'utilisateur %s a demandé l'affichage de la liste des users",utilisateurs[data->tid-1].pseudo);
                 nblus = ecrireLigne(journal, nom);
@@ -106,6 +126,36 @@ void *traiterRequete(void *arg) {
                 }
 
             }
+            else if (strcmp(texte, "2") == 0){
+                printf("worker%d: génération de mot de passe.\n", data->tid);
+                ecrireLog();
+                sprintf(nom,"L'utilisateur %s a demandé un mot de passe aléatoire",utilisateurs[data->tid-1].pseudo);
+                nblus = ecrireLigne(journal, nom);
+                if (nblus == -1) {
+                    erreur_IO("ecrireLigne");
+                }
+                pthread_mutex_lock(&mutex); /* On verrouille le mutex */
+                pthread_cond_wait (&condition, &mutex); /* On attend que la condition soit remplie */
+                sprintf(mes, "%s", motDePasse);
+                nbecr = ecrireLigne(data->canal, mes);
+                        if (nbecr == -1) {
+                            erreur_IO("ecrireLigne");
+                            arret = VRAI;
+                        }
+                nbecr = ecrireLigne(data->canal, "FIN\n");
+                if (nbecr == -1) {
+                    erreur_IO("ecrireLigne");
+                    arret = VRAI;
+                }
+                pthread_mutex_unlock(&mutex); /* On déverrouille le mutex */
+
+                nbecr = ecrireLigne(data->canal, "FIN\n");
+                if (nbecr == -1) {
+                    erreur_IO("ecrireLigne");
+                    arret = VRAI;
+                }
+
+            }
             else {
             	ecrireLog();
 	            nbecr = ecrireLigne(journal, texte);
@@ -113,7 +163,7 @@ void *traiterRequete(void *arg) {
                     erreur_IO("ecrireLigne");
                     arret = VRAI;
                 }
-	            printf("worker%d: ligne de %d octets ecrite dans le journal.\n", data->tid, nblus);
+	            printf("worker%d: ligne de %d octets écrite dans le journal.\n", data->tid, nblus);
 	            fflush(stdout);
             }
         }
@@ -134,6 +184,27 @@ int main(int argc, char *argv[]) {
     DataThread *data;
     short port;
     utilisateurs = malloc(0);
+    srand(time(NULL));
+
+
+    data = ajouterDataThread();
+        if (data == NULL) {
+            erreur("allocation impossible\n");
+        }   
+    
+        data->spec.tid = numthread;
+        ret = pthread_create(&data->spec.id, NULL, threadMdp, &data->spec);
+        if (ret != 0) {
+            erreur_IO("pthread_create");
+        }
+        else { /* thread main */
+            printf("server: worker %d créé : génération en cours\n", numthread);
+      
+            /* verification si des fils sont termines */
+            ret = joinDataThread();
+            if (ret > 0) printf("server: %d thread terminé.\n", ret);
+            fflush(stdout);
+        }
 
     if (argc != 2) {
         erreur("usage: %s port\n", argv[0]);
@@ -190,11 +261,11 @@ int main(int argc, char *argv[]) {
             erreur_IO("pthread_create");
         }
         else { /* thread main */
-            printf("server: worker %d cree\n", numthread);
+            printf("server: worker %d créé\n", numthread);
       
             /* verification si des fils sont termines */
             ret = joinDataThread();
-            if (ret > 0) printf("server: %d thread termine.\n", ret);
+            if (ret > 0) printf("server: %d thread terminé.\n", ret);
             fflush(stdout);
             continue;
         }
@@ -247,12 +318,10 @@ void generateMdp(char* motDePasse)
 {
     char password[120]="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890<>,?;.:/!§*µù$£¤¨+=})]à@ç^_`è|-[({'#é~&";
     int max=101,i,alea;
-    srand(time(NULL));
     for(i=0;i<32;i++)
     {       
         alea=rand()%(max);
         motDePasse[i]=password[alea];
     }   
     motDePasse[33]='\0';
-    printf("le mdp est %s\n",motDePasse);
 }

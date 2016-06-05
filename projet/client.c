@@ -104,6 +104,29 @@ int main(int argc, char *argv[]) {
 	            printf("Appuyez sur la touche entrée pour revenir au menu\n");
 	            getchar();
 	      	}
+	      	else if (strcmp(texte, "2\n") == 0){
+	      		affichage = FAUX;
+	      		printf("\nAffichage du mot de passe :\n");
+	      		while(affichage == FAUX){
+		      		nblus = lireLigne(sock, texte);
+			      	if (nblus == -1) {
+		                erreur_IO("lireLigne");
+		            }
+		            else if (nblus == LIGNE_MAX) {
+		                erreur("ligne trop longue\n");
+		            }
+		            else {
+		            	if(strcmp(texte, "FIN")==0){
+		            		affichage = VRAI;
+		            	}
+		            	else {
+			            	printf("%s\n", texte);
+			      		}
+		      		}
+	            }
+	            printf("Appuyez sur la touche entrée pour revenir au menu\n");
+	            getchar();
+	      	}
 	     	else {
 				printf("%s: ligne de %d octets envoyee au serveur.\n", CMD, nbecr);
 	      	}

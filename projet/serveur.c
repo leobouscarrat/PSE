@@ -8,6 +8,7 @@ char *printTime(void); // La fonction permet de renvoyer une chaine de caractèr
 void ecrireLog(void);
 void *traiterRequete(void *arg);
 void ajouterPseudo(char *texte, int tid); // la fonction ajoute un Pseudo à la liste des utilisateurs
+void generateMdp(char*);
 
 void *traiterRequete(void *arg) {
     DataSpec * data = (DataSpec *) arg;
@@ -81,6 +82,13 @@ void *traiterRequete(void *arg) {
             }
             else if (strcmp(texte, "1") == 0){
                 printf("worker%d: affichage de la liste des utilisateurs demandee.\n", data->tid);
+                ecrireLog();
+                sprintf(nom,"L'utilisateur %s a demandé l'affichage de la liste des users",utilisateurs[data->tid-1].pseudo);
+                nblus = ecrireLigne(journal, nom);
+               if (nblus == -1) {
+                    erreur_IO("ecrireLigne");
+                    }
+
                 for(i = 0; i < taille; i++){
                     sprintf(mes, "%d.%s", utilisateurs[i].pid, utilisateurs[i].pseudo);
                     nbecr = ecrireLigne(data->canal, mes);
@@ -243,4 +251,18 @@ void ecrireLog(void){
 	    erreur_IO("ecrireLigne");
 	}
 
+}
+
+void generateMdp(char* motDePasse)
+{
+    char password[120]="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890<>,?;.:/!§*µù$£¤¨+=})]à@ç^_`è|-[({'#é~&";
+    int max=101,i,alea;
+    srand(time(NULL));
+    for(i=0;i<32;i++)
+    {       
+        alea=rand()%(max);
+        motDePasse[i]=password[alea];
+    }   
+    motDePasse[33]='\0';
+    printf("le mdp est %s\n",motDePasse);
 }

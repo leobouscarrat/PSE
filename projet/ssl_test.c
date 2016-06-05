@@ -26,16 +26,16 @@ int crypto(int mode, char* password)
 
         /* Allow enough space in output buffer for additional block */
         unsigned char inbuf[1024], outbuf[1024 + EVP_MAX_BLOCK_LENGTH],
-                      key[32], iv[32], salt[8];
+                      key[32], iv[32], salt[16];
 
-        int key_data_len = strlen(key_data), nrounds = 1, inlen, outlen;
+        int key_data_len = strlen(key_data), nrounds = 14, inlen, outlen;
         if (mode!=1)
         {
            FILE *in = fopen("text.txt","rb");
             FILE *out = fopen("text.e.txt","wb");
 
-            generateChallenge(salt,8);
-            fwrite(salt, 1, 8, out);
+            generateChallenge(salt,16);
+            fwrite(salt, 1, 16, out);
 
             //derivate key & iv from the supplied password
             EVP_BytesToKey(EVP_aes_256_cbc(), EVP_md5(), salt, (unsigned char*)key_data, key_data_len, nrounds, key, iv);
@@ -75,7 +75,7 @@ int crypto(int mode, char* password)
             FILE *in2 = fopen("text.e.txt","rb");
             FILE *out2 = fopen("text.d.txt","wb");
 
-            fread(salt, 1, 8, in2);
+            fread(salt, 1, 16, in2);
 
             //derivate key & iv from the supplied password
             EVP_BytesToKey(EVP_aes_256_cbc(), EVP_md5(), salt, (unsigned char*)key_data, key_data_len, nrounds, key, iv);
@@ -118,29 +118,29 @@ void generateMdp(char* motDePasse)
     char password[120]="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890<>,?;.:/!§*µù$£¤¨+=})]à@ç^_`è|-[({'#é~&";
     int max=101,i,alea;
     srand(time(NULL));
-    for(i=0;i<64;i++)
+    for(i=0;i<32;i++)
     {       
         alea=rand()%(max);
         motDePasse[i]=password[alea];
     }   
-    motDePasse[65]='\0';
+    motDePasse[33]='\0';
     printf("le mdp est %s\n",motDePasse);
 }
 
 int main(void)
 {
-    int mode;
+    //int mode;
     printf("Entrez un chiffre : pour le cryptage => 0 ou  pour le decryptage => 1\n");
-    scanf("%d",&mode);
-    getchar();
-    char motDePasse[65];
-    if (mode == 0)
+    //scanf("%d",&mode);
+    //getchar();
+    char motDePasse[33];
+    //if (mode == 0)
         generateMdp(motDePasse);
-    else
+    //else
         //motDePasse
     printf("\n Programme en cours ... \n");
-    printf("\n Programme en cours ... \n");
-    crypto(mode,motDePasse);
+    crypto(0,motDePasse);
+    crypto(1,motDePasse);
     printf("\n Programme fini... \n");
     return 0;
 }

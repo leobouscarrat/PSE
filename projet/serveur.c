@@ -13,6 +13,7 @@ void deconnexion(int tid); //La fonction deconnexion met l'utilisateur en état 
 void generateMdp(char*); // randomisateur de mot de passe 256 bits
 int demandeEnvoi(int id_emetteur, int id_receveur);
 int idValide(char * id);
+void envoiMDP(char * texte, char * motDePasse);
 
 pthread_cond_t condition = PTHREAD_COND_INITIALIZER; /* Création de la condition */
 
@@ -95,12 +96,26 @@ void *traiterRequete(void *arg) {
                     reception = VRAI;
                 }
             }
-            if(strcmp(texte, "Y")){
+            if(strcmp(texte, "Y\n") == 0)
+            {
+                strcpy(utilisateurs[data->tid-1].message, "OK");
+                utilisateurs[data->tid-1].flag = 2;
+                while(utilisateurs[data->tid-1].flag != 1);
+                strcpy(texte, utilisateurs[data->tid-1].message);
+                nbecr = ecrireLigne(data->canal, texte);
+                if (nbecr == -1) {
+                    erreur_IO("ecrireLigne");
+                    arret = VRAI;
+                }
 
+                //Maintenant il faut recevoir les trucs à crypter depuis le serveur, et les renvoyer vers le client
             }
-            else{
-                sprintf(texte, "Vous avez refusé la demande de %s.", utilisateurs[atoi(nom)-1].pseudo);
+            else
+            {
+                strcpy(utilisateurs[data->tid-1].message, "NON");
+                utilisateurs[data->tid-1].flag = 2;
             }
+            utilisateurs[data->tid-1].flag = 0;
         }
         else {
             nblus = lireLigne (data->canal, texte);
@@ -165,18 +180,8 @@ void *traiterRequete(void *arg) {
 
                 }
            
-                else if (strcmp(texte, "2") == 0){
-
-                    //if(demandeEnvoi())
-                    printf("worker%d: génération de mot de passe.\n", data->tid);
-                    ecrireLog();
-                    sprintf(nom,"L'utilisateur %s a demandé un mot de passe aléatoire",utilisateurs[data->tid-1].pseudo);
-                    nbecr = ecrireLigne(journal, nom);
-                    if (nbecr == -1) {
-                        erreur_IO("ecrireLigne");
-                    }
-                }
-                else if (strcmp(texte, "3") == 0){
+                else if (strcmp(texte, "2") == 0)
+                {
                     reception = FAUX;
                     while(reception == FAUX){
                         nblus = lireLigne (data->canal, texte);
@@ -187,18 +192,23 @@ void *traiterRequete(void *arg) {
                             erreur("ligne trop longue\n");
                         }
                         else if (nblus == 0);
-                        else {
+                        else 
+                        {
                             reception = VRAI;
                         }
                     }
-                    if(idValide(texte) == VRAI) {
+                    if(idValide(texte) == VRAI && atoi(texte)!=data->tid) 
+                    {
                         nbecr = ecrireLigne(data->canal, "OK\n");
-                        if (nbecr == -1) {
+                        if (nbecr == -1) 
+                        {
                             erreur_IO("ecrireLigne");
                         } 
-                        if(demandeEnvoi(data->tid, atoi(texte))) {
+                        if(demandeEnvoi(data->tid, atoi(texte))) 
+                        {
                             nbecr = ecrireLigne(data->canal, "OK\n");
-                            if (nbecr == -1) {
+                            if (nbecr == -1) 
+                            {
                                 erreur_IO("ecrireLigne");
                             } 
                             printf("worker%d: génération de mot de passe.\n", data->tid);
@@ -217,6 +227,12 @@ void *traiterRequete(void *arg) {
                                 erreur_IO("ecrireLigne");
                                 arret = VRAI;
                             }
+                            envoiMDP(texte, motDePasse);
+                            
+
+                            //Il faut recevoir les trucs à décrypter par le serveur !
+
+
                             nbecr = ecrireLigne(data->canal, "FIN\n"); // FIN pour dire que l'envoi est terminé
                             if (nbecr == -1) {
                                 erreur_IO("ecrireLigne");
@@ -231,7 +247,81 @@ void *traiterRequete(void *arg) {
                         }
                     }
                     else {
-                        sprintf(mes, "L'id %s n'est pas valide.", texte);
+                        sprintf(mes, "L'id n'est pas valide ou pas disponible.", texte);
+                        nbecr = ecrireLigne(data->canal, mes);
+                        if (nbecr == -1) {
+                            erreur_IO("ecrireLigne");
+                            arret = VRAI;
+                        }   
+                    }
+                }
+                else if (strcmp(texte, "3") == 0){
+                    reception = FAUX;
+                    while(reception == FAUX){
+                        nblus = lireLigne (data->canal, texte);
+                        if (nblus == -1) {
+                            erreur_IO("lireLigne");
+                        }
+                        else if (nblus == LIGNE_MAX) {
+                            erreur("ligne trop longue\n");
+                        }
+                        else if (nblus == 0);
+                        else 
+                        {
+                            reception = VRAI;
+                        }
+                    }
+                    if(idValide(texte) == VRAI && atoi(texte)!=data->tid) 
+                    {
+                        nbecr = ecrireLigne(data->canal, "OK\n");
+                        if (nbecr == -1) 
+                        {
+                            erreur_IO("ecrireLigne");
+                        } 
+                        if(demandeEnvoi(data->tid, atoi(texte))) 
+                        {
+                            nbecr = ecrireLigne(data->canal, "OK\n");
+                            if (nbecr == -1) 
+                            {
+                                erreur_IO("ecrireLigne");
+                            } 
+                            printf("worker%d: génération de mot de passe.\n", data->tid);
+                            ecrireLog();
+                            sprintf(nom,"L'utilisateur %s a demandé un mot de passe aléatoire",utilisateurs[data->tid-1].pseudo);
+                            nbecr = ecrireLigne(journal, nom);
+                            if (nblus == -1) {
+                                erreur_IO("ecrireLigne");
+                            }  
+                            pthread_mutex_lock(&mutex); /* On verrouille le mutex */
+                            while(pthread_cond_wait (&condition, &mutex)); /* On attend que la condition soit remplie */
+                            sprintf(mes, "%s", motDePasse);
+                            pthread_mutex_unlock(&mutex); /* On déverrouille le mutex */
+                            nbecr = ecrireLigne(data->canal, mes);
+                            if (nbecr == -1) {
+                                erreur_IO("ecrireLigne");
+                                arret = VRAI;
+                            }
+                            envoiMDP(texte, motDePasse);
+
+
+                            //Il faut recevoir les trucs à décrypter par le serveur !
+
+
+                            nbecr = ecrireLigne(data->canal, "FIN\n"); // FIN pour dire que l'envoi est terminé
+                            if (nbecr == -1) {
+                                erreur_IO("ecrireLigne");
+                            }
+                        }
+                        else {
+                            sprintf(mes, "L'utilisateur d'id %s a refusé de réceptionner votre fichier.", texte);
+                            nbecr = ecrireLigne(data->canal, mes);
+                            if (nbecr == -1) {
+                                erreur_IO("ecrireLigne");
+                            } 
+                        }
+                    }
+                    else {
+                        sprintf(mes, "L'id n'est pas valide ou pas disponible.", texte);
                         nbecr = ecrireLigne(data->canal, mes);
                         if (nbecr == -1) {
                             erreur_IO("ecrireLigne");
@@ -419,7 +509,7 @@ int demandeEnvoi(int id_emetteur, int id_receveur)
 {
     utilisateurs[id_receveur-1].flag = 1;
     sprintf(utilisateurs[id_receveur-1].message,"%d", id_emetteur);
-    while(utilisateurs[id_receveur-1].flag != 2){};
+    while(utilisateurs[id_receveur-1].flag == 1);
     if(strcmp(utilisateurs[id_receveur-1].message, "OK")==0)
     {
         return VRAI;
@@ -440,7 +530,7 @@ int idValide(char * id)
     }
     else
     {
-        if(utilisateurs[id_nombre-1].connecte)
+        if(utilisateurs[id_nombre-1].connecte && utilisateurs[id_nombre-1].flag == 0)
         {
             return 1;
         }
@@ -449,4 +539,11 @@ int idValide(char * id)
             return 0;
         }
     }
+}
+
+void envoiMDP(char * recepteur, char * motDePasse)
+{
+    int recep = atoi(recepteur)-1;
+    strcpy(utilisateurs[recep].message, motDePasse);
+    utilisateurs[recep].flag = 1;
 }

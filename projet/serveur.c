@@ -126,7 +126,7 @@ void *traiterRequete(void *arg) {
                 }
 
             }
-            else if (strcmp(texte, "2") == 0){
+            else if (strcmp(texte, "3") == 0){
                 printf("worker%d: génération de mot de passe.\n", data->tid);
                 ecrireLog();
                 sprintf(nom,"L'utilisateur %s a demandé un mot de passe aléatoire",utilisateurs[data->tid-1].pseudo);

@@ -72,7 +72,7 @@ void *traiterRequete(void *arg) {
         }
         if(utilisateurs[data->tid - 1].flag) {
             strcpy(nom, utilisateurs[data->tid - 1].message);
-            sprintf(texte, "L'utilisateur %s d'id %s veut vous envoyez un message.\nAcceptez-vous de le recevoir ? (Y/N)\n", utilisateurs[atoi(nom)-1].pseudo, nom);
+            sprintf(texte, "L'utilisateur %s d'id %s veut vous envoyez un message. Acceptez-vous de le recevoir ? (Y/N)\n", utilisateurs[atoi(nom)-1].pseudo, nom);
             nbecr = ecrireLigne (data->canal, texte);
             if (nbecr == -1) {
                 erreur_IO("ecrireLigne");

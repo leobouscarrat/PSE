@@ -13,7 +13,6 @@ int main(int argc, char *argv[])
 {
   	int sock, arret = FAUX, ret, nbecr, nblus, affichage = FAUX, maxfd, signal = FAUX, nbsel;
   	struct sockaddr_in *sa;
-  	struct timeval wait_time;
   	char texte[LIGNE_MAX], mes[LIGNE_MAX];
   	char motDePasse[33];
   	fd_set fds;
@@ -90,15 +89,14 @@ int main(int argc, char *argv[])
 	    {
 		    FD_ZERO(&fds);
 	        FD_SET(sock, &fds); 
-	        FD_SET(STDIN, &fds); 
-	        wait_time.tv_sec = 1;
-			wait_time.tv_usec = 0;
+	        FD_SET(STDIN, &fds);
 	        nbsel = select(maxfd+1, &fds, NULL, NULL, NULL); 
-	        if (nbsel == -1) {
+	        if (nbsel == -1) 
+	        {
 			    perror("select"); // error occurred in select()
 			} 
-			else if (nbsel == 0) {
-			    printf("COUCOU\n");
+			else if (nbsel == 0) 
+			{
 			    continue;
 			} 
 			else {
@@ -115,7 +113,7 @@ int main(int argc, char *argv[])
 			        }
 			        else
 			        {
-			        	printf("\n\nJ'ai bien recu !\n");
+			        	printf("%s\n", texte);
 				    }
 				    signal = VRAI;
 		        }

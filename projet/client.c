@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
 	            printf("Appuyez sur la touche entrée pour revenir au menu\n");
 	            getchar();
 	      	}
-	      	else if (strcmp(texte, "2\n") == 0){
+	      	else if (strcmp(texte, "3\n") == 0){
 	      		affichage = FAUX;
 	      		printf("\nAffichage du mot de passe :\n");
 	      		while(affichage == FAUX){
@@ -125,7 +125,9 @@ int main(int argc, char *argv[])
 		            		affichage = VRAI;
 		            	}
 		            	else {
-			            	printf("cryptage en cours\n");
+			            	printf("Verifier que le fichier à crypter est bien dans le dossier de l'executable et posssède le nom : \"infile.txt\" \n");
+			            	printf("Appuyez sur la touche entrée pour lancer le cryptage\n");
+			            	getchar();
 			            	sprintf(motDePasse,"%s",texte);
 			            	crypto(0, motDePasse); 
 			      		}
@@ -145,16 +147,16 @@ int main(int argc, char *argv[])
 
 void menu (void)
 {
-	printf(" ----------------------------------------\n");
-	printf("|                  Menu                  |\n");
-	printf("|                                        |\n");
-	printf("|                                        |\n");
-	printf("| 1  Afficher la liste des utilisateurs  |\n");
-	printf("| 2  Envoyer un message à un utilisateur |\n");
-	printf("| 3  Envoyer un fichier a un utilisateur |\n");
-	printf("| /fin  Se deconnecter                   |\n");
-	printf("|                                        |\n");
-	printf(" ----------------------------------------\n");
+	printf("  ----------------------------------------\n");
+	printf(" |                  Menu                  |\n");
+	printf(" |                                        |\n");
+	printf(" |                                        |\n");
+	printf(" | 1  Afficher la liste des utilisateurs  |\n");
+	printf(" | 2  Envoyer un message à un utilisateur |\n");
+	printf(" | 3  Envoyer un fichier a un utilisateur |\n");
+	printf(" | /fin  Se deconnecter                   |\n");
+	printf(" |                                        |\n");
+	printf("  ----------------------------------------\n");
 	
 }
 
@@ -185,9 +187,8 @@ int crypto(int mode, char* password)
         int key_data_len = strlen(key_data), nrounds = 14, inlen, outlen;
         if (mode!=1)
         {
-           FILE *in = fopen("text.txt","rb");
-            FILE *out = fopen("text.e.txt","wb");
-
+            FILE *in = fopen("infile.txt","rb");
+            FILE *out = fopen("crypto.dat","wb");
             generateChallenge(salt,16);
             fwrite(salt, 1, 16, out);
 
@@ -226,8 +227,8 @@ int crypto(int mode, char* password)
         }
         else
         {
-            FILE *in2 = fopen("text.e.txt","rb");
-            FILE *out2 = fopen("text.d.txt","wb");
+            FILE *in2 = fopen("crypto.dat","rb");
+            FILE *out2 = fopen("decrypto.txt","wb");
 
             fread(salt, 1, 16, in2);
 

@@ -96,7 +96,7 @@ void *traiterRequete(void *arg) {
                     reception = VRAI;
                 }
             }
-            if(strcmp(texte, "Y\n") == 0)
+            if(strcmp(texte, "Y") == 0)
             {
                 strcpy(utilisateurs[data->tid-1].message, "OK");
                 utilisateurs[data->tid-1].flag = 2;
@@ -231,12 +231,6 @@ void *traiterRequete(void *arg) {
                             
 
                             //Il faut recevoir les trucs à décrypter par le serveur !
-
-
-                            nbecr = ecrireLigne(data->canal, "FIN\n"); // FIN pour dire que l'envoi est terminé
-                            if (nbecr == -1) {
-                                erreur_IO("ecrireLigne");
-                            }
                         }
                         else {
                             sprintf(mes, "L'utilisateur d'id %s a refusé de réceptionner votre fichier.", texte);

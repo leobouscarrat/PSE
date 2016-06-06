@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
 						    if (nbecr == -1) {
 								erreur_IO("ecrireLigne");
 					      	}
-					      	if(strcmp(texte,"Y\n"))
+					      	if(strcmp(texte,"Y\n")==0)
 					      	{
 					      		affichage = FAUX;
 					      		while(affichage == FAUX)
@@ -150,6 +150,8 @@ int main(int argc, char *argv[])
 						      		}
 						      	}
 						      	strcpy(motDePasse, texte);
+						      	printf("\nAffichage du mot de passe :\n%s\n", motDePasse);
+
 
 						      	//Maintenant il faut recevoir le truc à décrypter
 

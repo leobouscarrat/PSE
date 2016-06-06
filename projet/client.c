@@ -3,8 +3,8 @@
 #define CMD   "client"
 
 void menu(void);
-int crypto(int, char*);
-void generateChallenge(unsigned char* ,int);
+int crypto(int, char*); // fonction qui crypte/decrypte des fichiers
+void generateChallenge(unsigned char* ,int); // generation de 16 octets aléatoirement
 
 
 int main(int argc, char *argv[]) 
@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
   	struct sockaddr_in *sa;
   	char texte[LIGNE_MAX];
   	char motDePasse[33];
-  
+  																			/////////////////////////////////////////////////////////////////////////////////////
   	if (argc != 3) {
     	erreur("usage: %s machine port\n", argv[0]);
   	}
@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 
   	printf("%s: DNS resolving for %s, port %s\n", CMD, argv[1], argv[2]);
   	sa = resolv(argv[1], argv[2]);
-  	if (sa == NULL) {
+  	if (sa == NULL) {															//creation du socket de communication côté client
     	erreur("adresse %s et port %s inconnus\n", argv[1], argv[2]);
   	}
   	printf("%s: adr %s, port %hu\n", CMD,
@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
    		erreur_IO("Connect");
   	}
 
-  	freeResolv();
+  	freeResolv();															/////////////////////////////////////////////////////////////////////////////////////
 
 
   	/*Choix du nom d'utilisateur*/
@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 	else {
 	 	nbecr = ecrireLigne(sock, texte);
 	  	if (nbecr == -1) {
-			erreur_IO("ecrireLigne");
+			erreur_IO("ecrireLigne");										//enregistrement et envoie du pseudo du client
 			arret = VRAI;
 	 	}
 		printf("Nom enregistré par le serveur\n");
@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
             	printf("%s\n", texte);
             }
        	}
-
+       																		/////////////////////////////////////////////////////////////////////////////////////
   	while (arret == FAUX) {
   		menu();
 	    printf("ligne> ");
@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
   	exit(EXIT_SUCCESS);
 }
 
-void menu (void)
+void menu (void) // affichage du Menu
 {
 	printf("  ----------------------------------------\n");
 	printf(" |                  Menu                  |\n");
@@ -160,7 +160,7 @@ void menu (void)
 	
 }
 
-//pour générer un sel
+//pour générer 16 octets aléatoirement
 void generateChallenge(unsigned char *challenge,int chl_size)
 {
 
@@ -175,8 +175,8 @@ void generateChallenge(unsigned char *challenge,int chl_size)
 
 }
 
-//fonction pour chiffrer/déchiffrer
-int crypto(int mode, char* password)
+//fonction pour chiffrer/déchiffrer : le fonctionnement ne sera pas détaillé (AES 256 bits 14 tours) libssl-dev -lcrypto
+int crypto(int mode, char* password) // en entrée si on crypte ou decrypte (mode 0 ou 1) et le password, le fichier doit être dans le répertoire du client et se nommer "infile.txt" 
     {
         char *key_data=password;
 
@@ -266,5 +266,5 @@ int crypto(int mode, char* password)
             fclose(out2);
         }
 
-        return 1;
+        return 1; // output crypto.dat si cryptage et decrypto.txt si decryptage
     }

@@ -247,7 +247,7 @@ void *traiterRequete(void *arg) {
                         }
                     }
                     else {
-                        sprintf(mes, "L'id n'est pas valide ou pas disponible.", texte);
+                        sprintf(mes, "L'id n'est pas valide ou pas disponible.");
                         nbecr = ecrireLigne(data->canal, mes);
                         if (nbecr == -1) {
                             erreur_IO("ecrireLigne");
@@ -321,7 +321,7 @@ void *traiterRequete(void *arg) {
                         }
                     }
                     else {
-                        sprintf(mes, "L'id n'est pas valide ou pas disponible.", texte);
+                        sprintf(mes, "L'id n'est pas valide ou pas disponible.");
                         nbecr = ecrireLigne(data->canal, mes);
                         if (nbecr == -1) {
                             erreur_IO("ecrireLigne");

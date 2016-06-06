@@ -23,10 +23,10 @@ void *threadMdp (void* arg)
     {  
         pthread_mutex_lock (&mutex); /* On verrouille le mutex */
         for (i=0;i<10;i++)
-            generateMdp(motDePasse);
-        pthread_cond_signal (&condition); /* On délivre le signal : condition remplie */
+            generateMdp(motDePasse);       
         pthread_mutex_unlock (&mutex); /* On déverrouille le mutex */
-        usleep (3000000); /* On laisse 100 µsecondes de repos */
+        pthread_cond_signal (&condition); /* On délivre le signal : condition remplie */
+        usleep (1000); /* On laisse 100 µsecondes de repos */
     }
     pthread_exit(NULL); /* Fin du thread */
 }
@@ -133,10 +133,11 @@ void *traiterRequete(void *arg) {
                 nblus = ecrireLigne(journal, nom);
                 if (nblus == -1) {
                     erreur_IO("ecrireLigne");
-                }
+                }  
                 pthread_mutex_lock(&mutex); /* On verrouille le mutex */
-                pthread_cond_wait (&condition, &mutex); /* On attend que la condition soit remplie */
+                while(pthread_cond_wait (&condition, &mutex)); /* On attend que la condition soit remplie */
                 sprintf(mes, "%s", motDePasse);
+                pthread_mutex_unlock(&mutex); /* On déverrouille le mutex */
                 nbecr = ecrireLigne(data->canal, mes);
                         if (nbecr == -1) {
                             erreur_IO("ecrireLigne");
@@ -147,14 +148,6 @@ void *traiterRequete(void *arg) {
                     erreur_IO("ecrireLigne");
                     arret = VRAI;
                 }
-                pthread_mutex_unlock(&mutex); /* On déverrouille le mutex */
-
-                nbecr = ecrireLigne(data->canal, "FIN\n");
-                if (nbecr == -1) {
-                    erreur_IO("ecrireLigne");
-                    arret = VRAI;
-                }
-
             }
             else {
             	ecrireLog();

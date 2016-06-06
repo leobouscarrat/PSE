@@ -186,7 +186,6 @@ void *traiterRequete(void *arg) {
                             reception = VRAI;
                         }
                     }
-                    printf("Je recois %s", texte);
                     if(idValide(texte) == VRAI) {
                         nbecr = ecrireLigne(data->canal, "OK\n");
                         if (nbecr == -1) {

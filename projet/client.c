@@ -388,7 +388,6 @@ int main(int argc, char *argv[])
 							      	{
 							      		printf("L'autre utilisateur a bien accepté votre demande.\n");
 									    affichage = FAUX;
-							      		printf("\nAffichage du mot de passe :\n");
 							      		while(affichage == FAUX)
 							      		{
 								      		nblus = lireLigne(sock, texte);
@@ -412,6 +411,7 @@ int main(int argc, char *argv[])
 									            	printf("Appuyez sur la touche entrée pour lancer le cryptage\n");
 									            	getchar();
 									            	sprintf(motDePasse,"%s",texte);
+									            	printf("Affichage du mot de passe : %s\n", motDePasse);
 									            	crypto(0, motDePasse); 
 													if ((file = fopen("crypto.dat","rb")) == NULL){
   														perror("Erreur à l'ouverture du fichier");

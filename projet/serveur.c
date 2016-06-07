@@ -340,10 +340,7 @@ void *traiterRequete(void *arg)
                                 arret = VRAI;
                             }
                             envoiMDP(texte, motDePasse);
-                            
-
-                            //Il faut recevoir les trucs à décrypter par le serveur !
-                        }
+                        }     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                         else 
                         {
                             sprintf(mes, "L'utilisateur d'id %s a refusé de réceptionner votre fichier.", texte);

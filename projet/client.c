@@ -10,10 +10,11 @@ void viderBuffer(void);
 
 int main(int argc, char *argv[]) 
 {
-  	int sock, arret = FAUX, ret, nbecr, nblus, affichage = FAUX, maxfd, signal = FAUX, nbsel;
+  	int sock, arret = FAUX, ret, nbecr, nblus, affichage = FAUX, maxfd, signal = FAUX, nbsel,i,compteur=0;;
   	struct sockaddr_in *sa;
   	char texte[LIGNE_MAX], mes[LIGNE_MAX];
   	char motDePasse[33];
+  	FILE *file;
   	fd_set fds;
   	system("clear");
 
@@ -162,14 +163,25 @@ int main(int argc, char *argv[])
 						      		}
 						      	}
 						      	strcpy(motDePasse, texte);
-						      	printf("\nAffichage du message reçu :\n%s\n", motDePasse);
+						      	printf("\nAffichage du message/mot de passe reçu :\n%s\n", motDePasse);
 
+						      	if ((file = fopen("encrypted2.dat","wb")) == NULL)
+						      	{
+  										perror("Erreur à l'ouverture du fichier");
+  								}
+								while (strcmp(texte,"ok")!=0)
+								{
+									if (lireLigne(sock, texte) == -1) 
+									{
+										erreur_IO("ecrireLigne");
+									}
+									fputs(texte,file);
+								}
 
-						      	//Maintenant il faut recevoir le truc à décrypter
+								fclose(file);
 
 						      	printf("Appuyez sur la touche entrée pour revenir au menu\n");
 					            getchar();
-
 					      	}
 					      	else
 					      	{
@@ -315,7 +327,7 @@ int main(int argc, char *argv[])
 
 				      	else if (strcmp(texte, "3\n") == 0)
 				      	{
-				      		printf("\nA quel utilisateur voulez-vous envoyer votre message ? (mettre l'id)\n");
+				      		printf("\nA quel utilisateur voulez-vous envoyer votre fichier ? (mettre l'id)\n");
 				      		if (fgets(texte, LIGNE_MAX, stdin) == NULL) 
 				      		{
 						      	printf("Fin de fichier (ou erreur) : arret.\n");
@@ -368,7 +380,8 @@ int main(int argc, char *argv[])
 							      		printf("L'autre utilisateur a bien accepté votre demande.\n");
 									    affichage = FAUX;
 							      		printf("\nAffichage du mot de passe :\n");
-							      		while(affichage == FAUX){
+							      		while(affichage == FAUX)
+							      		{
 								      		nblus = lireLigne(sock, texte);
 									      	if (nblus == -1) 
 									      	{
@@ -391,9 +404,34 @@ int main(int argc, char *argv[])
 									            	getchar();
 									            	sprintf(motDePasse,"%s",texte);
 									            	crypto(0, motDePasse); 
-
-									            	//La il faut envoyer vers le serveur.
-									      		}
+													if ((file = fopen("encrypted.dat","rb")) == NULL)
+  														perror("Erreur à l'ouverture du fichier");
+  														else 
+  														{ /* parcours du fichier */
+   															while(fgetc(file) != EOF)
+  																compteur ++; /* incrémentation du compteur */
+ 														}
+														rewind(file);
+														for (i=0;compteur/159;i++)
+														{
+															fgets(texte,159,file);
+															if (ecrireLigne(sock, texte) == -1) 
+															{
+																erreur_IO("ecrireLigne");
+															}
+														}
+														fgets(texte,compteur%159,file);
+														if (ecrireLigne(sock, texte) == -1) 
+														{
+															erreur_IO("ecrireLigne");
+														}
+														sprintf(texte,"ok");
+														if (ecrireLigne(sock, texte) == -1) 
+														{
+														erreur_IO("ecrireLigne");
+														}
+														fclose(file);
+												}
 								      		}
 								      	}
 						            }

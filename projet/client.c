@@ -480,19 +480,7 @@ int main(int argc, char *argv[])
 
 void menu (void) // affichage du Menu
 {
-<<<<<<< HEAD
 	system("clear");
-	printf("  ----------------------------------------\n");
-	printf(" |                  Menu                  |\n");
-	printf(" |                                        |\n");
-	printf(" |                                        |\n");
-	printf(" | 1  Afficher la liste des utilisateurs  |\n");
-	printf(" | 2  Envoyer un message à un utilisateur |\n");
-	printf(" | 3  Envoyer un fichier a un utilisateur |\n");
-	printf(" | /fin  Se deconnecter                   |\n");
-	printf(" |                                        |\n");
-	printf("  ----------------------------------------\n");
-=======
 	printf("   ----------------------------------------\n");
 	printf("  |                  Menu                  |\n");
 	printf("  |                                        |\n");
@@ -505,9 +493,7 @@ void menu (void) // affichage du Menu
 	printf("  |                                        |\n");
 	printf("  | /fin  Se deconnecter                   |\n");
 	printf("  |                                        |\n");
-	printf("   ----------------------------------------\n");
->>>>>>> 80331fd044733bc187868f7a9b156893aa410506
-	
+	printf("   ----------------------------------------\n");	
 }
 
 //pour générer 16 octets aléatoirement

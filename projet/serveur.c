@@ -254,18 +254,12 @@ void *traiterRequete(void *arg)
                             {
                                 erreur("ligne trop longue\n");
                             }
-                            else if (nblus == 0);
+                            else if (nblus == 0){continue;}
                             else 
                             {
-                            envoiMDP(texte, mes);
-                            }
-                            
-
-                            nbecr = ecrireLigne(data->canal, "FIN\n"); // FIN pour dire que l'envoi est terminé
-                            if (nbecr == -1) 
-                            {
-                                erreur_IO("ecrireLigne");
-                            }
+                                envoiMDP(texte, mes);
+                                
+                            }  
                         }
                         else 
                         {
@@ -649,7 +643,6 @@ void envoiFichier_serv(char * recepteur, char * fichier)
 void envoiFichier_cli(int id_worker, int canal){
     char texte[LIGNE_MAX];
     int nbecr, i = utilisateurs[id_worker-1].flag;
-    printf("debug: function envoiFichier_cli\n");
     do{
         while(i == utilisateurs[id_worker-1].flag);
         strcpy(texte, utilisateurs[id_worker-1].message);

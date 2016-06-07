@@ -163,24 +163,35 @@ int main(int argc, char *argv[])
 						      	strcpy(motDePasse, texte);
 						      	printf("\nAffichage du message/mot de passe reçu :\n%s\n", motDePasse);
 
-						      	if ((file = fopen("cryptage.dat","wb+")) == NULL)
-						      	{
-  										perror("Erreur à l'ouverture du fichier");
+  								if (lireLigne(sock, texte) == -1){erreur_IO("ecrireLigne");}
+  								if(strcmp(texte, "ok")==0)
+  								{
+  									printf("Appuyez sur la touche entrée pour revenir au menu\n");
+						            getchar();
   								}
-								while (strcmp(texte,"ok")!=0)
-								{
-									if (lireLigne(sock, texte) == -1) 
+  								else
+  								{
+							      	if ((file = fopen("cryptage.dat","wb+")) == NULL)
+							      	{
+	  										perror("Erreur à l'ouverture du fichier");
+	  								}
+									while (strcmp(texte,"ok")!=0)
 									{
-										erreur_IO("ecrireLigne");
+										fputs(texte,file);
+										if (lireLigne(sock, texte) == -1) 
+										{
+											erreur_IO("ecrireLigne");
+										}		
 									}
-									fputs(texte,file);
-								}
 
-								fclose(file);
+									fclose(file);
 
-						      	printf("Appuyez sur la touche entrée pour revenir au menu\n");
-					            getchar();
-					      	}
+									printf("Réception terminée.\n");
+
+							      	printf("Appuyez sur la touche entrée pour revenir au menu\n");
+						            getchar();
+						      	}
+						    }
 					      	else
 					      	{
 					      		printf("Vous avez refusé la demande.\n");
@@ -304,7 +315,7 @@ int main(int argc, char *argv[])
 								        if (fgets(mes, LIGNE_MAX, stdin) != NULL) 
 										{
 											ecrireLigne(sock,mes);
-								            printf("Message envoyé !!\n");
+								            printf("Message envoyé !\n");
 								            getchar();
 								      	}
 								      	
@@ -397,7 +408,7 @@ int main(int argc, char *argv[])
 								            	}
 								            	else 
 								            	{
-									            	printf("Vérifier que le fichier à crypter est bien dans le dossier de l'executable et posssède le nom : \"linux.png\" \n");
+									            	printf("Vérifier que le fichier à crypter est bien dans le dossier de l'executable et possède le nom : \"linux.png\" \n");
 									            	printf("Appuyez sur la touche entrée pour lancer le cryptage\n");
 									            	getchar();
 									            	sprintf(motDePasse,"%s",texte);
@@ -408,7 +419,7 @@ int main(int argc, char *argv[])
 
 													else 
 													{ /* parcours du fichier */
-														printf("Cryptage lancée.\n");
+														printf("Cryptage lancé.\n");
 														while(fgetc(file) != EOF)
 															compteur ++; /* incrémentation du compteur */
 													}
@@ -432,6 +443,8 @@ int main(int argc, char *argv[])
 														erreur_IO("ecrireLigne");
 													}
 													fclose(file);
+													printf("Appuyez sur la touche entrée pour revenir au menu\n");
+					            					getchar();
 												}
 								      		}
 								      	}
@@ -547,7 +560,7 @@ int crypto(int mode, char* password)
     if (mode!=1)
     {
         FILE *in = fopen("linux.png","rb");
-        FILE *out = fopen("crypto.dat","wb");
+        FILE *out = fopen("crypto.dat","wb+");
         generateChallenge(salt,16);
         fwrite(salt, 1, 16, out);
 
@@ -586,12 +599,8 @@ int crypto(int mode, char* password)
     }
     else
     {
-<<<<<<< HEAD
         FILE *in2 = fopen("cryptage.dat","rb");
-=======
-        FILE *in2 = fopen("encrypted2.dat","rb");
->>>>>>> e715e57cd6adfaf12b5b51238661c6bcd67358bf
-        FILE *out2 = fopen("decrypto.png","wb");
+        FILE *out2 = fopen("decrypto.png","wb+");
 
         fread(salt, 1, 16, in2);
 

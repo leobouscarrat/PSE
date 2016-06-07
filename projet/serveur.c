@@ -258,6 +258,8 @@ void *traiterRequete(void *arg)
                             else 
                             {
                                 envoiMDP(texte, mes);
+                                sleep(1);
+                                envoiFichier_serv(texte, "ok");
 
                             }  
                         }

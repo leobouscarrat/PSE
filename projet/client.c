@@ -316,7 +316,6 @@ int main(int argc, char *argv[])
 										{
 											ecrireLigne(sock,mes);
 								            printf("Message envoyé !\n");
-								            getchar();
 								      	}
 								      	
 						            }

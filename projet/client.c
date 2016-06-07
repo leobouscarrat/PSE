@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
 			else {
 		        if (FD_ISSET(sock, &fds))
 		        {
-			      	viderBuffer();
+		        	system("clear");
 		            nblus = lireLigne(sock, texte);
 					if (nblus == -1) {
 			            erreur_IO("lireLigne");
@@ -154,6 +154,9 @@ int main(int argc, char *argv[])
 
 
 						      	//Maintenant il faut recevoir le truc à décrypter
+
+						      	printf("Appuyez sur la touche entrée pour revenir au menu\n");
+					            getchar();
 
 					      	}
 					      	else
@@ -406,6 +409,7 @@ int main(int argc, char *argv[])
 
 void menu (void) // affichage du Menu
 {
+	system("clear");
 	printf("  ----------------------------------------\n");
 	printf(" |                  Menu                  |\n");
 	printf(" |                                        |\n");

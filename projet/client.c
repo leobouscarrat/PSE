@@ -15,6 +15,7 @@ int main(int argc, char *argv[])
   	char texte[LIGNE_MAX], mes[LIGNE_MAX];
   	char motDePasse[33];
   	fd_set fds;
+  	system("clear");
 
   																			/////////////////////////////////////////////////////////////////////////////////////
   	if (argc != 3) 
@@ -203,6 +204,7 @@ int main(int argc, char *argv[])
 				      	else if (strcmp(texte, "1\n") == 0)
 				      	{
 				      		affichage = FAUX;
+				      		system("clear");
 				      		printf("\nAffichage liste des utilisateurs connectés :\n");
 				      		while(affichage == FAUX)
 				      		{

@@ -1018,3 +1018,27 @@ L'utilisateur u a demandé un mot de passe aléatoire
 Tue Jun  7 04:48:01 2016
 5
 >>>>>>> 80331fd044733bc187868f7a9b156893aa410506
+--------------------------------------------------------------------------------
+Tue Jun  7 02:57:49 2016
+Connexion d'un nouvel utilisateur : 
+Leo
+--------------------------------------------------------------------------------
+Tue Jun  7 02:58:17 2016
+L'utilisateur Leo a demandé l'affichage de la liste des users
+--------------------------------------------------------------------------------
+Tue Jun  7 03:01:49 2016
+L'utilisateur Leo s'est déconnecté
+--------------------------------------------------------------------------------
+Tue Jun  7 03:02:02 2016
+Connexion d'un nouvel utilisateur : 
+Leo
+--------------------------------------------------------------------------------
+Tue Jun  7 03:02:04 2016
+L'utilisateur Leo a demandé l'affichage de la liste des users
+--------------------------------------------------------------------------------
+Tue Jun  7 03:02:25 2016
+Connexion d'un nouvel utilisateur : 
+Test
+--------------------------------------------------------------------------------
+Tue Jun  7 03:02:26 2016
+L'utilisateur Test a demandé l'affichage de la liste des users

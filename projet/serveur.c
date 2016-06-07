@@ -188,12 +188,13 @@ void *traiterRequete(void *arg)
                     {
                         erreur_IO("ecrireLigne");
                     }
-            
-                   for(i = 0; i < taille; i++)
-                   {
+                    
+                    for(i = 0; i < taille; i++)
+                    {
                         if(utilisateurs[i].connecte)
                         {
-                            sprintf(mes, "%d.%s", i+1, utilisateurs[i].pseudo);
+                            if(i == data->tid-1){sprintf(mes, "%d.%s : c'est moi !", i+1, utilisateurs[i].pseudo);}
+                            else {sprintf(mes, "%d.%s", i+1, utilisateurs[i].pseudo);}
                             nbecr = ecrireLigne(data->canal, mes);
                             if (nbecr == -1) 
                             {

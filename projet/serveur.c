@@ -258,7 +258,11 @@ void *traiterRequete(void *arg)
                             {
                             envoiMDP(texte, mes);
                             }
-                            
+                            do
+                            {
+                              envoiMDP(texte, mes);  
+                            }
+                            while(strcmp(mes,"ok")!=0); 
 
                             nbecr = ecrireLigne(data->canal, "FIN\n"); // FIN pour dire que l'envoi est terminé
                             if (nbecr == -1) 

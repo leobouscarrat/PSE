@@ -14,6 +14,8 @@ void generateMdp(char*); // randomisateur de mot de passe 256 bits
 int demandeEnvoi(int id_emetteur, int id_receveur);
 int idValide(char * id);
 void envoiMDP(char * texte, char * motDePasse);
+void envoiFichier_serv(char * recepteur, char * fichier);
+void envoiFichier_cli(int id_worker, int canal);
 
 pthread_cond_t condition = PTHREAD_COND_INITIALIZER; /* Création de la condition */
 
@@ -83,50 +85,50 @@ void *traiterRequete(void *arg)
 
         if(utilisateurs[data->tid - 1].flag) 
         {
-        strcpy(nom, utilisateurs[data->tid - 1].message);
-        sprintf(texte, "L'utilisateur %s d'id %s veut vous envoyez un message. Acceptez-vous de le recevoir ? (Y/N)\n", utilisateurs[atoi(nom)-1].pseudo, nom);
-        nbecr = ecrireLigne (data->canal, texte);
-        if (nbecr == -1) 
-        {
-            erreur_IO("ecrireLigne");
-            arret = VRAI;
-        }
-        reception=FAUX;
-        while(reception==FAUX)
-        {
-            nblus = lireLigne(data->canal, texte);
-            if (nblus == -1) 
-            {
-                erreur_IO("lireLigne");
-            }
-            else if (nblus == LIGNE_MAX) 
-            {
-                erreur("ligne trop longue\n");
-            }
-            else if (nblus == 0) 
-            {
-                continue;
-            }
-            else 
-            {
-                reception = VRAI;
-            }
-        }
-        if(strcmp(texte, "Y") == 0)
-        {
-            strcpy(utilisateurs[data->tid-1].message, "OK");
-            utilisateurs[data->tid-1].flag = 2;
-            while(utilisateurs[data->tid-1].flag != 1);
-            strcpy(texte, utilisateurs[data->tid-1].message);
-            nbecr = ecrireLigne(data->canal, texte);
+            strcpy(nom, utilisateurs[data->tid - 1].message);
+            sprintf(texte, "L'utilisateur %s d'id %s veut vous envoyez un message. Acceptez-vous de le recevoir ? (Y/N)\n", utilisateurs[atoi(nom)-1].pseudo, nom);
+            nbecr = ecrireLigne (data->canal, texte);
             if (nbecr == -1) 
             {
                 erreur_IO("ecrireLigne");
                 arret = VRAI;
             }
-
-                //Maintenant il faut recevoir les trucs à crypter depuis le serveur, et les renvoyer vers le client
-        }
+            reception=FAUX;
+            while(reception==FAUX)
+            {
+                nblus = lireLigne(data->canal, texte);
+                if (nblus == -1) 
+                {
+                    erreur_IO("lireLigne");
+                }
+                else if (nblus == LIGNE_MAX) 
+                {
+                    erreur("ligne trop longue\n");
+                }
+                else if (nblus == 0) 
+                {
+                    continue;
+                }
+                else 
+                {
+                    reception = VRAI;
+                }
+            }
+            if(strcmp(texte, "Y") == 0)
+            {
+                strcpy(utilisateurs[data->tid-1].message, "OK");
+                utilisateurs[data->tid-1].flag = 2;
+                while(utilisateurs[data->tid-1].flag != 1);
+                strcpy(texte, utilisateurs[data->tid-1].message);
+                nbecr = ecrireLigne(data->canal, texte);
+                if (nbecr == -1) 
+                {
+                    erreur_IO("ecrireLigne");
+                    arret = VRAI;
+                }
+                printf("debug : avant appel envoiFichier_cli\n");
+                envoiFichier_cli(data->tid, data->canal);
+            }
             else
             {
                 strcpy(utilisateurs[data->tid-1].message, "NON");
@@ -340,7 +342,24 @@ void *traiterRequete(void *arg)
                                 arret = VRAI;
                             }
                             envoiMDP(texte, motDePasse);
+                            do{
+                                nblus = lireLigne (data->canal, mes);
+                                if (nblus == -1) 
+                                {
+                                    erreur_IO("lireLigne");
+                                }
+                                else if (nblus == LIGNE_MAX) 
+                                {
+                                    erreur("ligne trop longue\n");
+                                }
+                                else if (nblus == 0){
+                                    erreur("fichier mal envoyé\n");
+                                }
+                                else;
+                                envoiFichier_serv(texte, mes);
+                            }while(strcmp(mes, "OK")!=0);
                         }     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                        
                         else 
                         {
                             sprintf(mes, "L'utilisateur d'id %s a refusé de réceptionner votre fichier.", texte);
@@ -619,4 +638,23 @@ void envoiMDP(char * recepteur, char * motDePasse)
     int recep = atoi(recepteur)-1;
     strcpy(utilisateurs[recep].message, motDePasse);
     utilisateurs[recep].flag = 1;
+}
+
+void envoiFichier_serv(char * recepteur, char * fichier)
+{
+    int recep = atoi(recepteur)-1;
+    strcpy(utilisateurs[recep].message, fichier);
+    utilisateurs[recep].flag ++;
+}
+
+void envoiFichier_cli(int id_worker, int canal){
+    char texte[LIGNE_MAX];
+    int nbecr, i = utilisateurs[id_worker-1].flag;
+    printf("debug: function envoiFichier_cli\n");
+    do{
+        while(i == utilisateurs[id_worker-1].flag);
+        strcpy(texte, utilisateurs[id_worker-1].message);
+        nbecr = ecrireLigne(canal, texte);
+        if (nbecr == -1) {erreur_IO("ecrireLigne");}
+    }while(strcmp(texte, "OK")!=0);
 }

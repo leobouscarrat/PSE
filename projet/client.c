@@ -154,9 +154,7 @@ int main(int argc, char *argv[])
 							        {
 							            erreur("ligne trop longue\n");
 							        }
-							        else if (nblus == 0)
-							        {
-							        }
+							        else if (nblus == 0);
 							        else
 							        {
 							        	affichage = VRAI;
@@ -165,7 +163,7 @@ int main(int argc, char *argv[])
 						      	strcpy(motDePasse, texte);
 						      	printf("\nAffichage du message/mot de passe reçu :\n%s\n", motDePasse);
 
-						      	if ((file = fopen("encrypted2.dat","wb")) == NULL)
+						      	if ((file = fopen("cryptage.dat","wb+")) == NULL)
 						      	{
   										perror("Erreur à l'ouverture du fichier");
   								}
@@ -404,33 +402,38 @@ int main(int argc, char *argv[])
 									            	getchar();
 									            	sprintf(motDePasse,"%s",texte);
 									            	crypto(0, motDePasse); 
-													if ((file = fopen("encrypted.dat","rb")) == NULL)
+													if ((file = fopen("crypto.dat","rb")) == NULL){
   														perror("Erreur à l'ouverture du fichier");
-  														else 
-  														{ /* parcours du fichier */
-   															while(fgetc(file) != EOF)
-  																compteur ++; /* incrémentation du compteur */
- 														}
-														rewind(file);
-														for (i=0;compteur/159;i++)
-														{
-															fgets(texte,159,file);
-															if (ecrireLigne(sock, texte) == -1) 
-															{
-																erreur_IO("ecrireLigne");
-															}
-														}
-														fgets(texte,compteur%159,file);
+													}
+
+													else 
+													{ /* parcours du fichier */
+														printf("Cryptage lancée.\n");
+														while(fgetc(file) != EOF)
+															compteur ++; /* incrémentation du compteur */
+													}
+													rewind(file);
+													printf("compteur: %d\n", compteur);
+													for (i=0;i<compteur/159;i++)
+													{
+														fgets(texte,159,file);
 														if (ecrireLigne(sock, texte) == -1) 
 														{
 															erreur_IO("ecrireLigne");
 														}
-														sprintf(texte,"ok");
-														if (ecrireLigne(sock, texte) == -1) 
-														{
+														printf("Restant : %d\n", compteur - i);
+													}
+													fgets(texte,compteur%159,file);
+													if (ecrireLigne(sock, texte) == -1) 
+													{
 														erreur_IO("ecrireLigne");
-														}
-														fclose(file);
+													}
+													sprintf(texte,"ok");
+													if (ecrireLigne(sock, texte) == -1) 
+													{
+														erreur_IO("ecrireLigne");
+													}
+													fclose(file);
 												}
 								      		}
 								      	}
@@ -585,7 +588,7 @@ int crypto(int mode, char* password)
     }
     else
     {
-        FILE *in2 = fopen("crypto.dat","rb");
+        FILE *in2 = fopen("cryptage.dat","rb");
         FILE *out2 = fopen("decrypto.png","wb");
 
         fread(salt, 1, 16, in2);

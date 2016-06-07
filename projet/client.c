@@ -17,13 +17,15 @@ int main(int argc, char *argv[])
   	fd_set fds;
 
   																			/////////////////////////////////////////////////////////////////////////////////////
-  	if (argc != 3) {
+  	if (argc != 3) 
+  	{
     	erreur("usage: %s machine port\n", argv[0]);
   	}
 
   	printf("%s: creating a socket\n", CMD);
   	sock = socket (AF_INET, SOCK_STREAM, 0);
-  	if (sock < 0) {
+  	if (sock < 0) 
+  	{
     	erreur_IO("socket");
   	}
 
@@ -62,7 +64,8 @@ int main(int argc, char *argv[])
 	else 
 	{
 	 	nbecr = ecrireLigne(sock, texte);
-	  	if (nbecr == -1) {
+	  	if (nbecr == -1) 
+	  	{
 			erreur_IO("ecrireLigne");										//enregistrement et envoie du pseudo du client
 			arret = VRAI;
 	 	}
@@ -72,10 +75,12 @@ int main(int argc, char *argv[])
 		{
             erreur_IO("lireLigne");
         }
-        else if (nblus == LIGNE_MAX) {
+        else if (nblus == LIGNE_MAX) 
+        {
             erreur("ligne trop longue\n");
         }
-        else {
+        else 
+        {
         	printf("%s\n", texte);
         }
    	}
@@ -102,15 +107,18 @@ int main(int argc, char *argv[])
 			{
 			    continue;
 			} 
-			else {
+			else 
+			{
 		        if (FD_ISSET(sock, &fds))
 		        {
 		        	system("clear");
 		            nblus = lireLigne(sock, texte);
-					if (nblus == -1) {
+					if (nblus == -1) 
+					{
 			            erreur_IO("lireLigne");
 			        }
-			        else if (nblus == LIGNE_MAX) {
+			        else if (nblus == LIGNE_MAX) 
+			        {
 			            erreur("ligne trop longue\n");
 			        }
 			        else if (nblus == 0){
@@ -136,13 +144,16 @@ int main(int argc, char *argv[])
 					      		while(affichage == FAUX)
 					      		{
 						      		nblus = lireLigne(sock, texte);
-									if (nblus == -1) {
+									if (nblus == -1) 
+									{
 							            erreur_IO("lireLigne");
 							        }
-							        else if (nblus == LIGNE_MAX) {
+							        else if (nblus == LIGNE_MAX) 
+							        {
 							            erreur("ligne trop longue\n");
 							        }
-							        else if (nblus == 0){
+							        else if (nblus == 0)
+							        {
 							        }
 							        else
 							        {
@@ -169,7 +180,8 @@ int main(int argc, char *argv[])
 				    signal = VRAI;
 		        }
 			    
-		        if (FD_ISSET(STDIN, &fds)){
+		        if (FD_ISSET(STDIN, &fds))
+		        {
 				    if (fgets(texte, LIGNE_MAX, stdin) == NULL) 
 				    {
 				      	printf("Fin de fichier (ou erreur) : arrêt.\n");
@@ -179,7 +191,8 @@ int main(int argc, char *argv[])
 				    else
 				    {
 				      	nbecr = ecrireLigne(sock, texte);
-				      	if (nbecr == -1) {
+				      	if (nbecr == -1) 
+				      	{
 							erreur_IO("ecrireLigne");
 				      	}
 				      	if (strcmp(texte, "/fin\n") == 0) 
@@ -191,7 +204,8 @@ int main(int argc, char *argv[])
 				      	{
 				      		affichage = FAUX;
 				      		printf("\nAffichage liste des utilisateurs connectés :\n");
-				      		while(affichage == FAUX){
+				      		while(affichage == FAUX)
+				      		{
 					      		nblus = lireLigne(sock, texte);
 						      	if (nblus == -1) 
 						      	{
@@ -218,31 +232,38 @@ int main(int argc, char *argv[])
 				      	}
 				      	else if (strcmp(texte, "2\n") == 0){
 				      		printf("\nA quel utilisateur voulez-vous envoyer votre message ? (mettre l'id)\n");
-				      		if (fgets(texte, LIGNE_MAX, stdin) == NULL) {
+				      		if (fgets(texte, LIGNE_MAX, stdin) == NULL) 
+				      		{
 						      	printf("Fin de fichier (ou erreur) : arret.\n");
 						      	arret = VRAI;
 						      	continue;
 						    }
-						    else {                                                           //////////////////////////////////////////////////////////
+						    else 
+						    {                                                           //////////////////////////////////////////////////////////
 					      		nbecr = ecrireLigne(sock, texte);
-						      	if (nbecr == -1) {
+						      	if (nbecr == -1) 
+						      	{
 									erreur_IO("ecrireLigne");
 						      	}
 						      	affichage = FAUX;
-						      	while (affichage == FAUX){                                  //On vérifie que l'id soit valide.
+						      	while (affichage == FAUX)
+						      	{                                  										//On vérifie que l'id soit valide.
 						      		nblus = lireLigne(sock, mes);
 							      	if (nblus == -1) {
 						                erreur_IO("lireLigne");
 						            }
-						            else if (nblus == LIGNE_MAX) {
+						            else if (nblus == LIGNE_MAX) 
+						            {
 						                erreur("ligne trop longue\n");
 						            }
 						            else if(nblus == 0);
-						            else {
+						            else 
+						            {
 						            	affichage = VRAI;
 						            }
 						      	}                                                          //////////////////////////////////////////////////////////////////  
-						      	if(strcmp(mes, "OK")==0){ 
+						      	if(strcmp(mes, "OK")==0)
+						      	{ 
 						      		printf("L'id est valide. Demande en cours.\n");        //////////////////////////////////////////////////////
 					      			affichage = FAUX;                                      // On rentre ici si l'id est valide
 					      			while (affichage == FAUX)
@@ -277,7 +298,8 @@ int main(int argc, char *argv[])
 								            {
 								                erreur("ligne trop longue\n");
 								            }
-								            else {
+								            else 
+								            {
 								            	printf("Entrez le message a envoyé :\n");
 								            	if (fgets(texte, LIGNE_MAX, stdin) == NULL) 
 											    {
@@ -294,11 +316,13 @@ int main(int argc, char *argv[])
 								      		}
 								      	}
 						            }
-							        else {
+							        else 
+							        {
 							        	printf("%s\n", mes);
 							        }
 						    	}
-							    else {
+							    else 
+							    {
 							    	printf("L'id %s n'est pas valable.\n", texte);
 							    }
 					            printf("Appuyez sur la touche entrée pour revenir au menu\n");
@@ -306,16 +330,20 @@ int main(int argc, char *argv[])
 					        }
 				      	}
 
-				      	else if (strcmp(texte, "3\n") == 0){
+				      	else if (strcmp(texte, "3\n") == 0)
+				      	{
 				      		printf("\nA quel utilisateur voulez-vous envoyer votre message ? (mettre l'id)\n");
-				      		if (fgets(texte, LIGNE_MAX, stdin) == NULL) {
+				      		if (fgets(texte, LIGNE_MAX, stdin) == NULL) 
+				      		{
 						      	printf("Fin de fichier (ou erreur) : arret.\n");
 						      	arret = VRAI;
 						      	continue;
 						    }
-						    else {                                                           //////////////////////////////////////////////////////////
+						    else 
+						    {                                                           //////////////////////////////////////////////////////////
 					      		nbecr = ecrireLigne(sock, texte);
-						      	if (nbecr == -1) {
+						      	if (nbecr == -1) 
+						      	{
 									erreur_IO("ecrireLigne");
 						      	}
 						      	affichage = FAUX;
@@ -367,11 +395,14 @@ int main(int argc, char *argv[])
 								            {
 								                erreur("ligne trop longue\n");
 								            }
-								            else {
-								            	if(strcmp(texte, "FIN")==0){
+								            else 
+								            {
+								            	if(strcmp(texte, "FIN")==0)
+								            	{
 								            		affichage = VRAI;
 								            	}
-								            	else {
+								            	else 
+								            	{
 									            	printf("Vérifier que le fichier à crypter est bien dans le dossier de l'executable et posssède le nom : \"infile.txt\" \n");
 									            	printf("Appuyez sur la touche entrée pour lancer le cryptage\n");
 									            	getchar();
@@ -383,18 +414,58 @@ int main(int argc, char *argv[])
 								      		}
 								      	}
 						            }
-							        else {
+							        else 
+							        {
 							        	printf("%s\n", mes);
 							        }
 						    	}
-							    else {
+							    else 
+							    {
 							    	printf("L'id %s n'est pas valable.\n", texte);
 							    }
 					            printf("Appuyez sur la touche entrée pour revenir au menu\n");
 					            getchar();
 					        }
 				      	}
-				     	else {
+				      	else if (strcmp(texte, "4\n") == 0)
+				      	{
+				      		affichage = FAUX;
+				      		printf("\nCryptage du fichier demandé\n");
+				      		while(affichage == FAUX)
+				      		{
+					      		nblus = lireLigne(sock, texte);
+						      	if (nblus == -1) 
+						      	{
+					                erreur_IO("lireLigne");
+					            }
+					            else if (nblus == LIGNE_MAX) 
+					            {
+					                erreur("ligne trop longue\n");
+					            }
+					            else 
+					            {
+					            	printf("Appuyez sur la touche entrée pour lancer le cryptage\n");
+									getchar();
+									sprintf(motDePasse,"%s",texte);
+									crypto(0, motDePasse);
+									affichage = VRAI;
+					      		}
+				            }
+				            printf("Appuyez sur la touche entrée pour revenir au menu\n");
+				            getchar();
+				      	}
+				      	else if (strcmp(texte, "5\n") == 0)
+				      	{
+				      		printf("\nDecryptage du fichier demandé\n");
+				      	
+					        printf("Appuyez sur la touche entrée pour lancer le cryptage\n");
+							getchar();
+							crypto(1, motDePasse);
+				            printf("Appuyez sur la touche entrée pour revenir au menu\n");
+				            getchar();
+				      	}
+				     	else 
+				     	{
 							printf("Commande non reconnue\n");
 				      	}
 				      	signal = VRAI;
@@ -409,6 +480,7 @@ int main(int argc, char *argv[])
 
 void menu (void) // affichage du Menu
 {
+<<<<<<< HEAD
 	system("clear");
 	printf("  ----------------------------------------\n");
 	printf(" |                  Menu                  |\n");
@@ -420,6 +492,21 @@ void menu (void) // affichage du Menu
 	printf(" | /fin  Se deconnecter                   |\n");
 	printf(" |                                        |\n");
 	printf("  ----------------------------------------\n");
+=======
+	printf("   ----------------------------------------\n");
+	printf("  |                  Menu                  |\n");
+	printf("  |                                        |\n");
+	printf("  |                                        |\n");
+	printf("  | 1  Afficher la liste des utilisateurs  |\n");
+	printf("  | 2  Envoyer un message à un utilisateur |\n");
+	printf("  | 3  Envoyer un fichier a un utilisateur |\n");
+	printf("  | 4  Cryptage du fichier linux.png       |\n");
+	printf("  | 5  Decryptage du fichier crypto.dat    |\n");
+	printf("  |                                        |\n");
+	printf("  | /fin  Se deconnecter                   |\n");
+	printf("  |                                        |\n");
+	printf("   ----------------------------------------\n");
+>>>>>>> 80331fd044733bc187868f7a9b156893aa410506
 	
 }
 
@@ -431,7 +518,8 @@ void generateChallenge(unsigned char *challenge,int chl_size)
 
     r = RAND_bytes(challenge,chl_size);
 
-    if (!r) {
+    if (!r) 
+    {
         printf("\nInternal error !\n");
         exit(EXIT_FAILURE);
     }
@@ -449,7 +537,7 @@ int crypto(int mode, char* password)
     int key_data_len = strlen(key_data), nrounds = 14, inlen, outlen;
     if (mode!=1)
     {
-        FILE *in = fopen("infile.txt","rb");
+        FILE *in = fopen("linux.png","rb");
         FILE *out = fopen("crypto.dat","wb");
         generateChallenge(salt,16);
         fwrite(salt, 1, 16, out);
@@ -490,7 +578,7 @@ int crypto(int mode, char* password)
     else
     {
         FILE *in2 = fopen("crypto.dat","rb");
-        FILE *out2 = fopen("decrypto.txt","wb");
+        FILE *out2 = fopen("decrypto.png","wb");
 
         fread(salt, 1, 16, in2);
 

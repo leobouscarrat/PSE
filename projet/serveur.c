@@ -34,7 +34,8 @@ void *threadMdp (void* arg)  // thread qui génère des mots de passe aléatoire
     pthread_exit(NULL); /* Fin du thread */
 }
 
-void *traiterRequete(void *arg) {
+void *traiterRequete(void *arg) 
+{
     DataSpec * data = (DataSpec *) arg;
     int arret = FAUX, nblus, mode, pseudo = FAUX, nbecr, i, reception =FAUX;
     char texte[LIGNE_MAX], mes[LIGNE_MAX],nom[LIGNE_MAX];
@@ -43,28 +44,36 @@ void *traiterRequete(void *arg) {
 
     /*Dans un premier temps nous allons enregistrer le pseudo*/
     
-    while (arret == FAUX) {
-        while (pseudo == FAUX){                                                                                         //////////////////////////////////////////////////////////////////////////
+    while (arret == FAUX) 
+    {
+        while (pseudo == FAUX)
+        {                                                                                         //////////////////////////////////////////////////////////////////////////
             nblus = lireLigne (data->canal, texte);                                         
-            if (nblus == -1) {
+            if (nblus == -1) 
+            {
                 erreur_IO("lireLigne");
             }
-            else if (nblus == LIGNE_MAX) {
+            else if (nblus == LIGNE_MAX) 
+            {
                 erreur("ligne trop longue\n");
             }
-            else {
+            else 
+            {
                 ajouterPseudo(texte, data->tid);                                                                        //ce bloc permet de récupérer le pseudo de l'utlisateur et de faire le log
                 printf("worker%d enregistré, l'id est %d et le pseudo est %s \n", data->tid, data->tid, texte);         // de cette connexion
                 sprintf(mes, "Vous etes enregistré en tant que %s, votre id est %d\n", texte, data->tid);
                 ecrireLog();
-                if(ecrireLigne(journal,"Connexion d'un nouvel utilisateur : \n") == -1) {
+                if(ecrireLigne(journal,"Connexion d'un nouvel utilisateur : \n") == -1) 
+                {
 	    			erreur_IO("ecrireLigne");
 				}
-                if (ecrireLigne(journal, texte) == -1) {
+                if (ecrireLigne(journal, texte) == -1) 
+                {
 	    			erreur_IO("ecrireLigne");
 				}
                 nbecr = ecrireLigne(data->canal, mes);
-                if (nbecr == -1) {
+                if (nbecr == -1) 
+                {
                     erreur_IO("ecrireLigne");
                     arret = VRAI;
                 }
@@ -72,44 +81,52 @@ void *traiterRequete(void *arg) {
             }
         }                                                                                                  ////////////////////////////////////////////////////////////////////////////////
 
-        if(utilisateurs[data->tid - 1].flag) {
-            strcpy(nom, utilisateurs[data->tid - 1].message);
-            sprintf(texte, "L'utilisateur %s d'id %s veut vous envoyez un message. Acceptez-vous de le recevoir ? (Y/N)\n", utilisateurs[atoi(nom)-1].pseudo, nom);
-            nbecr = ecrireLigne (data->canal, texte);
-            if (nbecr == -1) {
+        if(utilisateurs[data->tid - 1].flag) 
+        {
+        strcpy(nom, utilisateurs[data->tid - 1].message);
+        sprintf(texte, "L'utilisateur %s d'id %s veut vous envoyez un message. Acceptez-vous de le recevoir ? (Y/N)\n", utilisateurs[atoi(nom)-1].pseudo, nom);
+        nbecr = ecrireLigne (data->canal, texte);
+        if (nbecr == -1) 
+        {
+            erreur_IO("ecrireLigne");
+            arret = VRAI;
+        }
+        reception=FAUX;
+        while(reception==FAUX)
+        {
+            nblus = lireLigne(data->canal, texte);
+            if (nblus == -1) 
+            {
+                erreur_IO("lireLigne");
+            }
+            else if (nblus == LIGNE_MAX) 
+            {
+                erreur("ligne trop longue\n");
+            }
+            else if (nblus == 0) 
+            {
+                continue;
+            }
+            else 
+            {
+                reception = VRAI;
+            }
+        }
+        if(strcmp(texte, "Y") == 0)
+        {
+            strcpy(utilisateurs[data->tid-1].message, "OK");
+            utilisateurs[data->tid-1].flag = 2;
+            while(utilisateurs[data->tid-1].flag != 1);
+            strcpy(texte, utilisateurs[data->tid-1].message);
+            nbecr = ecrireLigne(data->canal, texte);
+            if (nbecr == -1) 
+            {
                 erreur_IO("ecrireLigne");
                 arret = VRAI;
             }
-            reception=FAUX;
-            while(reception==FAUX){
-                nblus = lireLigne(data->canal, texte);
-                if (nblus == -1) {
-                    erreur_IO("lireLigne");
-                }
-                else if (nblus == LIGNE_MAX) {
-                    erreur("ligne trop longue\n");
-                }
-                else if (nblus == 0) {
-                    continue;
-                }
-                else {
-                    reception = VRAI;
-                }
-            }
-            if(strcmp(texte, "Y") == 0)
-            {
-                strcpy(utilisateurs[data->tid-1].message, "OK");
-                utilisateurs[data->tid-1].flag = 2;
-                while(utilisateurs[data->tid-1].flag != 1);
-                strcpy(texte, utilisateurs[data->tid-1].message);
-                nbecr = ecrireLigne(data->canal, texte);
-                if (nbecr == -1) {
-                    erreur_IO("ecrireLigne");
-                    arret = VRAI;
-                }
 
                 //Maintenant il faut recevoir les trucs à crypter depuis le serveur, et les renvoyer vers le client
-            }
+        }
             else
             {
                 strcpy(utilisateurs[data->tid-1].message, "NON");
@@ -117,38 +134,47 @@ void *traiterRequete(void *arg) {
             }
             utilisateurs[data->tid-1].flag = 0;
         }
-        else {
+        else 
+        {
             nblus = lireLigne (data->canal, texte);
-            if (nblus == -1) {
+            if (nblus == -1) 
+            {
                 erreur_IO("lireLigne");
             }
-            else if (nblus == LIGNE_MAX) {
+            else if (nblus == LIGNE_MAX) 
+            {
                 erreur("ligne trop longue\n");
     
             }
-            else if (nblus == 0) {
+            else if (nblus == 0) 
+            {
                 continue;
             }
-            else {                                                                                                      /////////////////////////////////////////////////////////////////////////////////////
-                if (strcmp(texte, "/fin") == 0) {
+            else 
+            {                                                                                                      /////////////////////////////////////////////////////////////////////////////////////
+                if (strcmp(texte, "/fin") == 0) 
+                {
     	           printf("worker%d: arret demandé.\n", data->tid);
     	           ecrireLog();
     	           sprintf(nom,"L'utilisateur %s s'est déconnecté",utilisateurs[data->tid-1].pseudo);
     	           nblus = ecrireLigne(journal, nom);
-                   if (nblus == -1) {
+                   if (nblus == -1) 
+                   {
     	    			erreur_IO("ecrireLigne");                                                                           // si le serveur recoit /fin de la part du worker X alors il ferme la connexion et
-    					}                                                                                                   // la thread du worker 
+    		       }                                                                                                   // la thread du worker 
     	           arret = VRAI;
     	           continue;                                                                                              ////////////////////////////////////////////////////////////////////////////////////
                 }
                 else if (strcmp(texte, "/init") == 0) 
                 {
     	           printf("worker%d: remise à zéro du journal demandée.\n", data->tid);
-    	           if (close(journal) == -1) {
+    	           if (close(journal) == -1) 
+                   {
     	               erreur_IO("close journal");                                                                         // i le serveur recoit /fin de la part du worker X alors il réinitialise le log
-    	            }
+    	           }
     	            journal = open("journal.log", mode, 0660);
-    	            if (journal == -1) {
+    	            if (journal == -1) 
+                    {
     	               erreur_IO("open trunc journal");
     	            }  
                 }                                                                                                            ///////////////////////////////////////////////////////////////////////////////
@@ -158,22 +184,27 @@ void *traiterRequete(void *arg) {
                     ecrireLog();
                     sprintf(nom,"L'utilisateur %s a demandé l'affichage de la liste des users",utilisateurs[data->tid-1].pseudo);
                     nblus = ecrireLigne(journal, nom);
-                    if (nblus == -1) {
+                    if (nblus == -1) 
+                    {
                         erreur_IO("ecrireLigne");
                     }
             
-                   for(i = 0; i < taille; i++){
-                        if(utilisateurs[i].connecte){
+                   for(i = 0; i < taille; i++)
+                   {
+                        if(utilisateurs[i].connecte)
+                        {
                             sprintf(mes, "%d.%s", i+1, utilisateurs[i].pseudo);
                             nbecr = ecrireLigne(data->canal, mes);
-                            if (nbecr == -1) {
+                            if (nbecr == -1) 
+                            {
                                 erreur_IO("ecrireLigne");                                                                       // si le serveur reçoit 1 il envoie la liste des utilisateurs au client
                                 arret = VRAI;                                                                                   // comme FIN termine l'envoi, le client sait que la liste est complète
                             }
                         }
                     }                                           
                     nbecr = ecrireLigne(data->canal, "FIN\n");
-                    if (nbecr == -1) {
+                    if (nbecr == -1) 
+                    {
                         erreur_IO("ecrireLigne");
                         arret = VRAI;
                     }                                                                                                           /////////////////////////////////////////////////////////////////////////////
@@ -183,12 +214,15 @@ void *traiterRequete(void *arg) {
                 else if (strcmp(texte, "2") == 0)
                 {
                     reception = FAUX;
-                    while(reception == FAUX){
+                    while(reception == FAUX)
+                    {
                         nblus = lireLigne (data->canal, texte);
-                        if (nblus == -1) {
+                        if (nblus == -1) 
+                        {
                             erreur_IO("lireLigne");
                         }
-                        else if (nblus == LIGNE_MAX) {
+                        else if (nblus == LIGNE_MAX) 
+                        {
                             erreur("ligne trop longue\n");
                         }
                         else if (nblus == 0);
@@ -215,7 +249,8 @@ void *traiterRequete(void *arg) {
                             ecrireLog();
                             sprintf(nom,"L'utilisateur %s a demandé un mot de passe aléatoire",utilisateurs[data->tid-1].pseudo);
                             nbecr = ecrireLigne(journal, nom);
-                            if (nblus == -1) {
+                            if (nblus == -1) 
+                            {
                                 erreur_IO("ecrireLigne");
                             }  
                             pthread_mutex_lock(&mutex); /* On verrouille le mutex */
@@ -223,7 +258,8 @@ void *traiterRequete(void *arg) {
                             sprintf(mes, "%s", motDePasse);
                             pthread_mutex_unlock(&mutex); /* On déverrouille le mutex */
                             nbecr = ecrireLigne(data->canal, mes);
-                            if (nbecr == -1) {
+                            if (nbecr == -1) 
+                            {
                                 erreur_IO("ecrireLigne");
                                 arret = VRAI;
                             }
@@ -232,31 +268,38 @@ void *traiterRequete(void *arg) {
 
                             //Il faut recevoir les trucs à décrypter par le serveur !
                         }
-                        else {
+                        else 
+                        {
                             sprintf(mes, "L'utilisateur d'id %s a refusé de réceptionner votre fichier.", texte);
                             nbecr = ecrireLigne(data->canal, mes);
-                            if (nbecr == -1) {
+                            if (nbecr == -1) 
+                            {
                                 erreur_IO("ecrireLigne");
                             } 
                         }
                     }
-                    else {
+                    else 
+                    {
                         sprintf(mes, "L'id n'est pas valide ou pas disponible.");
                         nbecr = ecrireLigne(data->canal, mes);
-                        if (nbecr == -1) {
+                        if (nbecr == -1) 
+                        {
                             erreur_IO("ecrireLigne");
                             arret = VRAI;
                         }   
                     }
                 }
-                else if (strcmp(texte, "3") == 0){
+                else if (strcmp(texte, "3") == 0)
+                {
                     reception = FAUX;
                     while(reception == FAUX){
                         nblus = lireLigne (data->canal, texte);
-                        if (nblus == -1) {
+                        if (nblus == -1) 
+                        {
                             erreur_IO("lireLigne");
                         }
-                        else if (nblus == LIGNE_MAX) {
+                        else if (nblus == LIGNE_MAX) 
+                        {
                             erreur("ligne trop longue\n");
                         }
                         else if (nblus == 0);
@@ -283,7 +326,8 @@ void *traiterRequete(void *arg) {
                             ecrireLog();
                             sprintf(nom,"L'utilisateur %s a demandé un mot de passe aléatoire",utilisateurs[data->tid-1].pseudo);
                             nbecr = ecrireLigne(journal, nom);
-                            if (nblus == -1) {
+                            if (nblus == -1) 
+                            {
                                 erreur_IO("ecrireLigne");
                             }  
                             pthread_mutex_lock(&mutex); /* On verrouille le mutex */
@@ -291,7 +335,8 @@ void *traiterRequete(void *arg) {
                             sprintf(mes, "%s", motDePasse);
                             pthread_mutex_unlock(&mutex); /* On déverrouille le mutex */
                             nbecr = ecrireLigne(data->canal, mes);
-                            if (nbecr == -1) {
+                            if (nbecr == -1) 
+                            {
                                 erreur_IO("ecrireLigne");
                                 arret = VRAI;
                             }
@@ -306,27 +351,54 @@ void *traiterRequete(void *arg) {
                                 erreur_IO("ecrireLigne");
                             }
                         }
-                        else {
+                        else 
+                        {
                             sprintf(mes, "L'utilisateur d'id %s a refusé de réceptionner votre fichier.", texte);
                             nbecr = ecrireLigne(data->canal, mes);
-                            if (nbecr == -1) {
+                            if (nbecr == -1) 
+                            {
                                 erreur_IO("ecrireLigne");
                             } 
                         }
                     }
-                    else {
+                    else 
+                    {
                         sprintf(mes, "L'id n'est pas valide ou pas disponible.");
                         nbecr = ecrireLigne(data->canal, mes);
-                        if (nbecr == -1) {
+                        if (nbecr == -1) 
+                        {
                             erreur_IO("ecrireLigne");
                             arret = VRAI;
                         }   
                     }
                 }
-                else {
+                else if (strcmp(texte, "4") == 0)
+                {
+                    printf("worker%d: génération de mot de passe.\n", data->tid);
+                    ecrireLog();
+                    sprintf(nom,"L'utilisateur %s a demandé un mot de passe aléatoire",utilisateurs[data->tid-1].pseudo);
+                    nbecr = ecrireLigne(journal, nom);
+                    if (nblus == -1) 
+                    {
+                        erreur_IO("ecrireLigne");
+                    }
+                    pthread_mutex_lock(&mutex); /* On verrouille le mutex */
+                    while(pthread_cond_wait (&condition, &mutex)); /* On attend que la condition soit remplie */
+                    sprintf(mes, "%s", motDePasse);
+                    pthread_mutex_unlock(&mutex); /* On déverrouille le mutex */
+                    nbecr = ecrireLigne(data->canal, mes);
+                    if (nbecr == -1) 
+                    {
+                        erreur_IO("ecrireLigne");
+                        arret = VRAI;
+                    }
+                }
+                else 
+                {
                 	ecrireLog();
     	            nbecr = ecrireLigne(journal, texte);     // on log le texte envoyé s'il ne déclenche pas de commande
-                     if (nbecr == -1) {
+                    if (nbecr == -1) 
+                    {
                         erreur_IO("ecrireLigne");
                         arret = VRAI;
                     }
@@ -336,7 +408,8 @@ void *traiterRequete(void *arg) {
             }
         }
     }
-    if (close(data->canal) == -1) {                         // fermeture du canal entre le client et le serveur
+    if (close(data->canal) == -1) 
+    {                         // fermeture du canal entre le client et le serveur
         erreur_IO("close");
     }
     deconnexion(data->tid);                                 // passage à l'état deconnecté pour le client 
@@ -345,7 +418,8 @@ void *traiterRequete(void *arg) {
 }
 
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) 
+{
     int ecoute, canal, ret, mode, numthread = 0;
     struct sockaddr_in adrEcoute, reception;
     socklen_t receptionlen = sizeof(reception);
@@ -356,32 +430,38 @@ int main(int argc, char *argv[]) {
 
 
     data = ajouterDataThread();                                                /////////////////////////////////////////////////////////////////////////////////////////////////
-        if (data == NULL) {
+        if (data == NULL) 
+        {
             erreur("allocation impossible\n");
         }   
     
         data->spec.tid = numthread;
         ret = pthread_create(&data->spec.id, NULL, threadMdp, &data->spec); 
-        if (ret != 0) {
+        if (ret != 0) 
+        {
             erreur_IO("pthread_create");                                            //creation de la thread de generation de mot de passe
         }
-        else { /* thread main */
+        else 
+        { /* thread main */
             printf("server: worker %d créé : génération en cours\n", numthread);
       
             /* verification si des fils sont termines */
             ret = joinDataThread();
             if (ret > 0) printf("server: %d thread terminé.\n", ret);        
-        if (data == NULL) {
+        if (data == NULL) 
+        {
             fflush(stdout);                                                 
         }                                                                        /////////////////////////////////////////////////////////////////////////////////////////////////
 
-    if (argc != 2) {                                                          
+    if (argc != 2) 
+    {                                                          
         erreur("usage: %s port\n", argv[0]);
     }
 
     mode = O_WRONLY|O_APPEND|O_CREAT;
     journal = open("journal.log", mode, 0660);
-    if (journal == -1) {
+    if (journal == -1) 
+    {
         erreur_IO("open journal");
     }
 
@@ -389,7 +469,8 @@ int main(int argc, char *argv[]) {
   
     printf("server: creating a socket\n");
     ecoute = socket (AF_INET, SOCK_STREAM, 0);                                  // creation du socket d'ecoute de tentative de connexion 
-    if (ecoute < 0) {
+    if (ecoute < 0) 
+    {
         erreur_IO("socket");
     }
   
@@ -398,20 +479,24 @@ int main(int argc, char *argv[]) {
     adrEcoute.sin_port = htons(port);
     printf("server: binding to INADDR_ANY address on port %d\n", port);
     ret = bind (ecoute,  (struct sockaddr *) &adrEcoute, sizeof(adrEcoute));
-    if (ret < 0) {
+    if (ret < 0) 
+    {
         erreur_IO("bind");
     }
   
     printf("server: listening to socket\n");
     ret = listen (ecoute, 20);
-    if (ret < 0) {
+    if (ret < 0) 
+    {
         erreur_IO("listen");
     }                                                                           /////////////////////////////////////////////////////////////////////////////////////////////////
 
-    while (VRAI) {
+    while (VRAI) 
+    {
         printf("server: waiting to a connection\n");
         canal = accept(ecoute, (struct sockaddr *) &reception, &receptionlen);
-        if (canal < 0) {
+        if (canal < 0) 
+        {
             erreur_IO("accept");
         }
         printf("server: adr %s, port %hu\n",
@@ -419,17 +504,20 @@ int main(int argc, char *argv[]) {
 	        ntohs(reception.sin_port));
 
         data = ajouterDataThread();
-        if (data == NULL) {
+        if (data == NULL) 
+        {
             erreur("allocation impossible\n");                                     // creation d'un worker traiterRequete lors d'une connexion d'un nouvel utilisateur
         }   
     
         data->spec.tid = ++numthread;
         data->spec.canal = canal;
         ret = pthread_create(&data->spec.id, NULL, traiterRequete, &data->spec);
-        if (ret != 0) {
+        if (ret != 0) 
+        {
             erreur_IO("pthread_create");
         }
-        else { /* thread main */
+        else 
+        { /* thread main */
             printf("server: worker %d créé\n", numthread);
       
             /* verification si des fils sont termines */
@@ -446,7 +534,8 @@ int main(int argc, char *argv[]) {
 
 }
 
-void ajouterPseudo(char *texte, int tid){ // fonction qui ajoute un utilisateur à la liste globale avec le pid coreespondant et l'état "connecté"
+void ajouterPseudo(char *texte, int tid)
+{ // fonction qui ajoute un utilisateur à la liste globale avec le pid coreespondant et l'état "connecté"
     utilisateurs = realloc(utilisateurs, sizeof(utilisateurs[0])+1); //on augmente la taille du tableau quand un nouvel utilisateur se connecte
     strcpy(utilisateurs[taille].pseudo, texte);
     utilisateurs[taille].connecte = VRAI;

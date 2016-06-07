@@ -258,7 +258,7 @@ void *traiterRequete(void *arg)
                             else 
                             {
                                 envoiMDP(texte, mes);
-                                
+
                             }  
                         }
                         else 
@@ -350,7 +350,7 @@ void *traiterRequete(void *arg)
                                 }
                                 else;
                                 envoiFichier_serv(texte, mes);
-                            }while(strcmp(mes, "OK")!=0);
+                            }while(strncmp(mes, "ok", 2)!=0);
                         }     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                         
                         else 
@@ -648,5 +648,5 @@ void envoiFichier_cli(int id_worker, int canal){
         strcpy(texte, utilisateurs[id_worker-1].message);
         nbecr = ecrireLigne(canal, texte);
         if (nbecr == -1) {erreur_IO("ecrireLigne");}
-    }while(strcmp(texte, "OK")!=0);
+    }while(strncmp(texte, "ok", 2)!=0);
 }

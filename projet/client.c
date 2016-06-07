@@ -164,7 +164,7 @@ int main(int argc, char *argv[])
 						      	printf("\nAffichage du message/mot de passe reçu :\n%s\n", motDePasse);
 
   								if (lireLigne(sock, texte) == -1){erreur_IO("ecrireLigne");}
-  								if(strcmp(texte, "ok")==0)
+  								if(strncmp(texte, "ok", 2)==0)
   								{
   									printf("Appuyez sur la touche entrée pour revenir au menu\n");
 						            getchar();
@@ -175,7 +175,7 @@ int main(int argc, char *argv[])
 							      	{
 	  										perror("Erreur à l'ouverture du fichier");
 	  								}
-									while (strcmp(texte,"ok")!=0)
+									while (strncmp(texte,"ok", 2)!=0)
 									{
 										fputs(texte,file);
 										if (lireLigne(sock, texte) == -1) 
@@ -443,8 +443,7 @@ int main(int argc, char *argv[])
 														erreur_IO("ecrireLigne");
 													}
 													fclose(file);
-													printf("Appuyez sur la touche entrée pour revenir au menu\n");
-					            					getchar();
+					            					affichage = VRAI;
 												}
 								      		}
 								      	}

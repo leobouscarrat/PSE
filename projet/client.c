@@ -307,6 +307,7 @@ int main(int argc, char *argv[])
 							            	affichage = VRAI;
 							            }
 							      	}
+							      	viderBuffer();
 							      	if(strcmp(mes, "OK")==0)
 							      	{
 							      		printf("L'autre utilisateur a bien accepté votre demande.\n\n");

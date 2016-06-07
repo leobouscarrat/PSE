@@ -211,8 +211,83 @@ void *traiterRequete(void *arg)
                     }                                                                                                           /////////////////////////////////////////////////////////////////////////////
 
                 }
-           
                 else if (strcmp(texte, "2") == 0)
+                {
+                    reception = FAUX;
+                    while(reception == FAUX){
+                        nblus = lireLigne (data->canal, texte);
+                        if (nblus == -1) 
+                        {
+                            erreur_IO("lireLigne");
+                        }
+                        else if (nblus == LIGNE_MAX) 
+                        {
+                            erreur("ligne trop longue\n");
+                        }
+                        else if (nblus == 0);
+                        else 
+                        {
+                            reception = VRAI;
+                        }
+                    }
+                    if(idValide(texte) == VRAI && atoi(texte)!=data->tid) 
+                    {
+                        nbecr = ecrireLigne(data->canal, "OK\n");
+                        if (nbecr == -1) 
+                        {
+                            erreur_IO("ecrireLigne");
+                        } 
+                        if(demandeEnvoi(data->tid, atoi(texte))) 
+                        {
+                            nbecr = ecrireLigne(data->canal, "OK\n");
+                            if (nbecr == -1) 
+                            {
+                                erreur_IO("ecrireLigne");
+                            } 
+                            nblus = lireLigne (data->canal, mes);
+                            if (nblus == -1) 
+                            {
+                                erreur_IO("lireLigne");
+                            }
+                            else if (nblus == LIGNE_MAX) 
+                            {
+                                erreur("ligne trop longue\n");
+                            }
+                            else if (nblus == 0);
+                            else 
+                            {
+                            envoiMDP(texte, mes);
+                            }
+                            
+
+                            nbecr = ecrireLigne(data->canal, "FIN\n"); // FIN pour dire que l'envoi est terminé
+                            if (nbecr == -1) 
+                            {
+                                erreur_IO("ecrireLigne");
+                            }
+                        }
+                        else 
+                        {
+                            sprintf(mes, "L'utilisateur d'id %s a refusé de réceptionner votre fichier.", texte);
+                            nbecr = ecrireLigne(data->canal, mes);
+                            if (nbecr == -1) 
+                            {
+                                erreur_IO("ecrireLigne");
+                            } 
+                        }
+                    }
+                    else 
+                    {
+                        sprintf(mes, "L'id n'est pas valide ou pas disponible.");
+                        nbecr = ecrireLigne(data->canal, mes);
+                        if (nbecr == -1) 
+                        {
+                            erreur_IO("ecrireLigne");
+                            arret = VRAI;
+                        }   
+                    }
+                }
+                else if (strcmp(texte, "3") == 0)
                 {
                     reception = FAUX;
                     while(reception == FAUX)
@@ -289,90 +364,7 @@ void *traiterRequete(void *arg)
                             arret = VRAI;
                         }   
                     }
-                }
-                else if (strcmp(texte, "3") == 0)
-                {
-                    reception = FAUX;
-                    while(reception == FAUX){
-                        nblus = lireLigne (data->canal, texte);
-                        if (nblus == -1) 
-                        {
-                            erreur_IO("lireLigne");
-                        }
-                        else if (nblus == LIGNE_MAX) 
-                        {
-                            erreur("ligne trop longue\n");
-                        }
-                        else if (nblus == 0);
-                        else 
-                        {
-                            reception = VRAI;
-                        }
-                    }
-                    if(idValide(texte) == VRAI && atoi(texte)!=data->tid) 
-                    {
-                        nbecr = ecrireLigne(data->canal, "OK\n");
-                        if (nbecr == -1) 
-                        {
-                            erreur_IO("ecrireLigne");
-                        } 
-                        if(demandeEnvoi(data->tid, atoi(texte))) 
-                        {
-                            nbecr = ecrireLigne(data->canal, "OK\n");
-                            if (nbecr == -1) 
-                            {
-                                erreur_IO("ecrireLigne");
-                            } 
-                            printf("worker%d: génération de mot de passe.\n", data->tid);
-                            ecrireLog();
-                            sprintf(nom,"L'utilisateur %s a demandé un mot de passe aléatoire",utilisateurs[data->tid-1].pseudo);
-                            nbecr = ecrireLigne(journal, nom);
-                            if (nblus == -1) 
-                            {
-                                erreur_IO("ecrireLigne");
-                            }  
-                            pthread_mutex_lock(&mutex); /* On verrouille le mutex */
-                            while(pthread_cond_wait (&condition, &mutex)); /* On attend que la condition soit remplie */
-                            sprintf(mes, "%s", motDePasse);
-                            pthread_mutex_unlock(&mutex); /* On déverrouille le mutex */
-                            nbecr = ecrireLigne(data->canal, mes);
-                            if (nbecr == -1) 
-                            {
-                                erreur_IO("ecrireLigne");
-                                arret = VRAI;
-                            }
-                            envoiMDP(texte, motDePasse);
-
-
-                            //Il faut recevoir les trucs à décrypter par le serveur !
-
-
-                            nbecr = ecrireLigne(data->canal, "FIN\n"); // FIN pour dire que l'envoi est terminé
-                            if (nbecr == -1) {
-                                erreur_IO("ecrireLigne");
-                            }
-                        }
-                        else 
-                        {
-                            sprintf(mes, "L'utilisateur d'id %s a refusé de réceptionner votre fichier.", texte);
-                            nbecr = ecrireLigne(data->canal, mes);
-                            if (nbecr == -1) 
-                            {
-                                erreur_IO("ecrireLigne");
-                            } 
-                        }
-                    }
-                    else 
-                    {
-                        sprintf(mes, "L'id n'est pas valide ou pas disponible.");
-                        nbecr = ecrireLigne(data->canal, mes);
-                        if (nbecr == -1) 
-                        {
-                            erreur_IO("ecrireLigne");
-                            arret = VRAI;
-                        }   
-                    }
-                }
+                } 
                 else if (strcmp(texte, "4") == 0)
                 {
                     printf("worker%d: génération de mot de passe.\n", data->tid);

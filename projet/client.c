@@ -162,7 +162,7 @@ int main(int argc, char *argv[])
 						      		}
 						      	}
 						      	strcpy(motDePasse, texte);
-						      	printf("\nAffichage du mot de passe :\n%s\n", motDePasse);
+						      	printf("\nAffichage du message reçu :\n%s\n", motDePasse);
 
 
 						      	//Maintenant il faut recevoir le truc à décrypter
@@ -232,7 +232,8 @@ int main(int argc, char *argv[])
 				            printf("Appuyez sur la touche entrée pour revenir au menu\n");
 				            getchar();
 				      	}
-				      	else if (strcmp(texte, "2\n") == 0){
+				      	else if (strcmp(texte, "2\n") == 0)
+				      	{
 				      		printf("\nA quel utilisateur voulez-vous envoyer votre message ? (mettre l'id)\n");
 				      		if (fgets(texte, LIGNE_MAX, stdin) == NULL) 
 				      		{
@@ -287,36 +288,16 @@ int main(int argc, char *argv[])
 							      	}
 							      	if(strcmp(mes, "OK")==0)
 							      	{
-							      		printf("L'autre utilisateur a bien accepté votre demande.\n");
-									    affichage = FAUX;
-							      		printf("\nAffichage du mot de passe :\n");
-							      		while(affichage == FAUX){
-								      		nblus = lireLigne(sock, texte);
-									      	if (nblus == -1) 
-									      	{
-								                erreur_IO("lireLigne");
-								            }
-								            else if (nblus == LIGNE_MAX) 
-								            {
-								                erreur("ligne trop longue\n");
-								            }
-								            else 
-								            {
-								            	printf("Entrez le message a envoyé :\n");
-								            	if (fgets(texte, LIGNE_MAX, stdin) == NULL) 
-											    {
-											      	printf("Fin de fichier (ou erreur) : arrêt.\n");
-											      	arret = VRAI;
-											      	continue;
-											    }
-								            	printf("Appuyez sur la touche entrée pour lancer le cryptage\n");
-								            	getchar();
-								            	sprintf(motDePasse,"%s",texte);
-								            	crypto(0, motDePasse); 
-								            	//La il faut le renvoyer côté serveur
-								            	affichage = VRAI;
-								      		}
+							      		printf("L'autre utilisateur a bien accepté votre demande.\n\n");
+
+								        printf("Entrez le message a envoyé :\n");
+								        if (fgets(mes, LIGNE_MAX, stdin) != NULL) 
+										{
+											ecrireLigne(sock,mes);
+								            printf("Message envoyé !!\n");
+								            getchar();
 								      	}
+								      	
 						            }
 							        else 
 							        {
@@ -463,6 +444,7 @@ int main(int argc, char *argv[])
 					        printf("Appuyez sur la touche entrée pour lancer le cryptage\n");
 							getchar();
 							crypto(1, motDePasse);
+				            
 				            printf("Appuyez sur la touche entrée pour revenir au menu\n");
 				            getchar();
 				      	}

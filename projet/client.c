@@ -397,7 +397,7 @@ int main(int argc, char *argv[])
 								            	}
 								            	else 
 								            	{
-									            	printf("Vérifier que le fichier à crypter est bien dans le dossier de l'executable et posssède le nom : \"infile.txt\" \n");
+									            	printf("Vérifier que le fichier à crypter est bien dans le dossier de l'executable et posssède le nom : \"linux.png\" \n");
 									            	printf("Appuyez sur la touche entrée pour lancer le cryptage\n");
 									            	getchar();
 									            	sprintf(motDePasse,"%s",texte);
@@ -413,7 +413,6 @@ int main(int argc, char *argv[])
 															compteur ++; /* incrémentation du compteur */
 													}
 													rewind(file);
-													printf("compteur: %d\n", compteur);
 													for (i=0;i<compteur/159;i++)
 													{
 														fgets(texte,159,file);
@@ -421,7 +420,6 @@ int main(int argc, char *argv[])
 														{
 															erreur_IO("ecrireLigne");
 														}
-														printf("Restant : %d\n", compteur - i);
 													}
 													fgets(texte,compteur%159,file);
 													if (ecrireLigne(sock, texte) == -1) 
@@ -588,7 +586,11 @@ int crypto(int mode, char* password)
     }
     else
     {
+<<<<<<< HEAD
         FILE *in2 = fopen("cryptage.dat","rb");
+=======
+        FILE *in2 = fopen("encrypted2.dat","rb");
+>>>>>>> e715e57cd6adfaf12b5b51238661c6bcd67358bf
         FILE *out2 = fopen("decrypto.png","wb");
 
         fread(salt, 1, 16, in2);

@@ -126,7 +126,6 @@ void *traiterRequete(void *arg)
                     erreur_IO("ecrireLigne");
                     arret = VRAI;
                 }
-                printf("debug : avant appel envoiFichier_cli\n");
                 envoiFichier_cli(data->tid, data->canal);
             }
             else

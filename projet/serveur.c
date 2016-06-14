@@ -352,7 +352,7 @@ void *traiterRequete(void *arg)
                                 }
                                 else;
                                 envoiFichier_serv(texte, mes);
-                            }while(strncmp(mes, "ok", 2)!=0);
+                            }while(strncmp(mes, "OK", 2)!=0);
                         }     /////////////////////////////////////////////////////////////////////////////////////////////////////////////
                         
                         else 
@@ -639,16 +639,17 @@ void envoiFichier_serv(char * recepteur, char * fichier)
 {
     int recep = atoi(recepteur)-1;
     strcpy(utilisateurs[recep].message, fichier);
-    utilisateurs[recep].flag ++;
+    utilisateurs[recep].flag =1;
 }
 
 void envoiFichier_cli(int id_worker, int canal){
     char texte[LIGNE_MAX];
-    int nbecr, i = utilisateurs[id_worker-1].flag;
+    int nbecr; //i = utilisateurs[id_worker-1].flag;
     do{
-        while(i == utilisateurs[id_worker-1].flag);
+        while(utilisateurs[id_worker-1].flag!=1);
         strcpy(texte, utilisateurs[id_worker-1].message);
         nbecr = ecrireLigne(canal, texte);
         if (nbecr == -1) {erreur_IO("ecrireLigne");}
-    }while(strncmp(texte, "ok", 2)!=0);
+        utilisateurs[id_worker-1].flag --;
+    }while(strncmp(texte, "OK", 2)!=0);
 }

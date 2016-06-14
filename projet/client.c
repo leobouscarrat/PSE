@@ -162,27 +162,30 @@ int main(int argc, char *argv[])
 						      	}
 						      	strcpy(motDePasse, texte);
 						      	printf("\nAffichage du message/mot de passe reçu :\n%s\n", motDePasse);
-
   								if (lireLigne(sock, texte) == -1){erreur_IO("ecrireLigne");}
-  								if(strncmp(texte, "ok", 2)==0)
+  								if(strncmp(texte, "OK", 2)==0)
   								{
   									printf("Appuyez sur la touche entrée pour revenir au menu\n");
 						            getchar();
   								}
   								else
   								{
-							      	if ((file = fopen("cryptage.dat","wb+")) == NULL)
+							      	if ((file = fopen("cryptage.dat","wb")) == NULL)
 							      	{
 	  										perror("Erreur à l'ouverture du fichier");
 	  								}
-									while (strncmp(texte,"ok", 2)!=0)
+									do
 									{
-										fputs(texte,file);
-										if (lireLigne(sock, texte) == -1) 
+										printf("yolo\n");
+										if (lireLigne(sock, texte) <0) 
 										{
 											erreur_IO("ecrireLigne");
-										}		
-									}
+										}
+										else
+										{
+											fputs(texte,file);
+										}	
+									}while (strcmp(texte,"OK")!=0);
 
 									fclose(file);
 
@@ -412,7 +415,7 @@ int main(int argc, char *argv[])
 									            	getchar();
 									            	sprintf(motDePasse,"%s",texte);
 									            	printf("Affichage du mot de passe : %s\n", motDePasse);
-									            	crypto(0, motDePasse); 
+									            	//crypto(0, motDePasse); 
 													if ((file = fopen("crypto.dat","rb")) == NULL){
   														perror("Erreur à l'ouverture du fichier");
 													}
@@ -426,9 +429,11 @@ int main(int argc, char *argv[])
 													rewind(file);
 													for (i=0;i<compteur/159;i++)
 													{
+														printf("Affichage du mot de passe : %d\n", i);
 														fgets(texte,159,file);
 														if (ecrireLigne(sock, texte) == -1) 
 														{
+
 															erreur_IO("ecrireLigne");
 														}
 													}
@@ -437,7 +442,7 @@ int main(int argc, char *argv[])
 													{
 														erreur_IO("ecrireLigne");
 													}
-													sprintf(texte,"ok");
+													sprintf(texte,"OK");
 													if (ecrireLigne(sock, texte) == -1) 
 													{
 														erreur_IO("ecrireLigne");
